@@ -1,24 +1,23 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
+
+import DeliveryReadyUpload from './routes/delivery_ready/DeliveryReadyUpload';
+import CreateCustomTableHeader from './routes/delivery_ready/CreateCustomTableHeader';
+
+import { ThemeProvider } from "@material-ui/core/styles";
+import { unstable_createMuiStrictModeTheme } from '@material-ui/core/styles';
+
+const theme = unstable_createMuiStrictModeTheme();
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <ThemeProvider theme={theme}>
+          <Route path="/delivery-ready/storage" exact component={CreateCustomTableHeader}></Route>
+          <Route path="/delivery-ready" exact component={DeliveryReadyUpload}></Route>
+      </ThemeProvider>
+    </Router>
   );
 }
 
