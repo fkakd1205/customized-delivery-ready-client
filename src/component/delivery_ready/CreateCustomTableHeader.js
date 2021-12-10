@@ -118,8 +118,6 @@ const CreateCustomTableHeader = (props) => {
             <Container>
                 <Title>3PL 선택</Title>
                 <DataContainer className="container">
-                        {/* <CustomColDiv>{customHeader[0].title}</CustomColDiv>
-                        <CustomColDiv>네이버 컬럼 선택</CustomColDiv> */}
                 {customHeader && customHeader.map((data, headerIdx) => {
                     return (
                         <>

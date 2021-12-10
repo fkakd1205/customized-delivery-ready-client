@@ -285,7 +285,6 @@ const DeliveryReadyUpload = (props) => {
                     }
                 }
             }
-            
         }
     }
 

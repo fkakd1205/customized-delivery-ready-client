@@ -52,7 +52,6 @@ const BodyTd = styled.td`
 
 const CustomizedDeliveryReadyDataView = (props) => {
     const [customHeader, setCustomHeader] = useState(null);
-    const [customizedChangeData, setCustomizedChangeData] = useState([]);
     
     useEffect(() => {
         async function fetchInit() {
