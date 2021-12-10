@@ -3,6 +3,8 @@ import {useState, useEffect} from 'react';
 import axios from 'axios';
 import { isCompositeComponent } from 'react-dom/test-utils';
 
+import CustomizedDeliveryReadyDataView from './CustomizedDeliveryReadyDataView';
+
 const Container = styled.div`
     overflow:hidden;
     margin-bottom: 100px;
@@ -14,7 +16,7 @@ const UploadBar = styled.div`
     width: 100%;
     height: auto;
     display: grid;
-    grid-template-columns: repeat(2, 300px);
+    grid-template-columns: repeat(4, 300px);
     /* flex-wrap: wrap; */
     border-radius: 5px;
     background-color: rgba(122, 123, 218, 0.125);
@@ -158,6 +160,7 @@ const DeliveryReadyUpload = (props) => {
     const [formData, setFormData] = useState(new FormData());
     const [refFormHeader, setRefFormHeader] = useState(null);
     const [originColData, setOriginColData] = useState(null);
+    const [customizedDeliveryReadyData, setCustomizedDeliveryReadyData] = useState(null);
 
     const config = {
         headers: {
@@ -195,8 +198,6 @@ const DeliveryReadyUpload = (props) => {
                             
                             let originExcelData = res.data.data.map(r => r.deliveryReadyCustomItem.details);
                             setOriginColData(originExcelData);
-
-                            console.log(originExcelData);
                         }
                     })
                     .catch(err => {
@@ -204,19 +205,6 @@ const DeliveryReadyUpload = (props) => {
                         alert('undefined error. : uploadExcelFile');
                     })
             },
-            // storeExcelFile: async function (e) {
-            //     await axios.post("/api/v1/delivery-ready/customize/store", formData, config)
-            //         .then(res => {
-            //             if (res.status === 200 && res.data && res.data.message === 'success') {
-            //                 console.log(formData);
-            //                 // props.history.replace('/delivery-ready-view');
-            //             }
-            //         })
-            //         .catch(err => {
-            //             console.log(err);
-            //             alert('undefined error. : storeExcelFile');
-            //         })
-            // },
             storeExcelFile: async function (e) {
                 await axios.post("/api/v1/delivery-ready/customize/store", excelData)
                     .then(res => {
@@ -241,6 +229,24 @@ const DeliveryReadyUpload = (props) => {
                         console.log(err);
                         alert('undefined error. : getRefFormData');
                     })
+            },
+            downloadCustomizedOrderForm: async function () {
+                await axios.post(`/api/v1/delivery-ready/customize/download/tailo`, {
+                        responseType: 'blob',
+                        withCredentials:true
+                    })
+            },
+            changeCustomizedOrderForm: async function () {
+                await axios.post("/api/v1/delivery-ready/customize/view", excelData)
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            setCustomizedDeliveryReadyData(res.data.data);
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        alert('undefined error. : changeCustomizedOrderForm');
+                    })
             }
         }
     }
@@ -262,7 +268,24 @@ const DeliveryReadyUpload = (props) => {
                         await __handleDataConnect().storeExcelFile(e);
                     }
                 }
+            },
+            downloadCustomizedOrderForm: function () {
+                return {
+                    submit: async function (e) {
+                        e.preventDefault();
+                        await __handleDataConnect().downloadCustomizedOrderForm(e);
+                    }
+                }
+            },
+            changeCustomizedOrderForm: function () {
+                return {
+                    submit: async function (e) {
+                        e.preventDefault();
+                        await __handleDataConnect().changeCustomizedOrderForm();
+                    }
+                }
             }
+            
         }
     }
 
@@ -277,9 +300,11 @@ const DeliveryReadyUpload = (props) => {
                     <Form onSubmit={(e) => __handleEventControl().storeExcelData().submit(e)}>
                         <ControlBtn type="submit"><b>네이버</b> 배송준비 엑셀 파일 저장</ControlBtn>
                     </Form>
+                    <Form onSubmit={(e) => __handleEventControl().changeCustomizedOrderForm().submit(e)}>
+                        <ControlBtn type="submit"><b>테일로</b> 발주서 양식으로 변환</ControlBtn>
+                    </Form>
                 </UploadBar>
                 <TableContainer>
-                    {console.log(excelData)}
                     <table className="table table-sm" style={{ tableLayout: 'fixed' }}>
                         <thead>
                             <tr>
@@ -305,7 +330,10 @@ const DeliveryReadyUpload = (props) => {
                     </table>
                 </TableContainer>
             </Container>
-            {/* } */}
+
+            <CustomizedDeliveryReadyDataView
+                customizedDeliveryReadyData={customizedDeliveryReadyData}
+            ></CustomizedDeliveryReadyDataView>
         </>
     );
 }
