@@ -10,6 +10,7 @@ const CustomizedDeliveryReadyNaverViewMain = () => {
     const [customizedDeliveryReadyData, setCustomizedDeliveryReadyData] = useState(null);
     const [customHeader, setCustomHeader] = useState(null);
     const [excelData, setExcelData] = useState(null);
+    const [customizedDetails, setCustomizedDetails] = useState(null);
 
     useEffect(() => {
         async function fetchInit() {
@@ -50,7 +51,12 @@ const CustomizedDeliveryReadyNaverViewMain = () => {
                 await customizedDeliveryReadyNaverDataConnect().searchAllCustomDeliveryReadyItem()
                     .then(res => {
                         if(res.status === 200 && res.data && res.data.message === 'success') {
+                            let data = res.data.data;
+
+                            let customizedData = data.map(r => r.customizedDeliveryReadyItem);
+
                             setCustomizedDeliveryReadyData(res.data.data);
+                            setCustomizedDetails(customizedData)
                         }
                     })
                     .catch(err => {
@@ -79,6 +85,7 @@ const CustomizedDeliveryReadyNaverViewMain = () => {
             <CustomizedDeliveryReadyNaverViewBody
                 customizedDeliveryReadyData={customizedDeliveryReadyData}
                 customHeader={customHeader}
+                customizedDetails={customizedDetails}
 
                 __handleEventControl={__handleEventControl}
             ></CustomizedDeliveryReadyNaverViewBody>

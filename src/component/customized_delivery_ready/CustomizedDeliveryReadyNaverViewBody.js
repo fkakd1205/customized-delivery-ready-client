@@ -222,16 +222,18 @@ const CustomizedDeliveryReadyNaverViewBody = (props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {props.customizedDeliveryReadyData?.map((data, index1) => {
+                            {console.log(props.customizedDetails)}
+                            {props.customizedDetails?.map((data, index1) => {     
                                 return(
-                                <BodyTr>
-                                    {data.customizedDeliveryReadyItem.map((data2, index2) => {       
-                                        return(
-                                            <BodyTd key={'custom_data' + index1 + '_idx' + index2} className="col">{data2.custom_col_data}</BodyTd>
-                                        )
-                                    })}
-                                </BodyTr>
-                            )})}
+                                    <BodyTr>
+                                        {data.details?.map((data2, index2) => {
+                                            return(
+                                                    <BodyTd key={'custom_data' + index1 + '_idx' + index2} className="col">{data2.custom_col_data != null ? data2.custom_col_data : ""}</BodyTd>
+                                            )
+                                        })}
+                                    </BodyTr>
+                                )
+                            })}  
                         </tbody>
                     </table>
                 </TableContainer>
