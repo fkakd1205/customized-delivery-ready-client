@@ -9,6 +9,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import { unstable_createMuiStrictModeTheme } from '@material-ui/core/styles';
 import DeliveryReadyNaverUploadMain from './component/customized_delivery_ready/DeliveryReadyNaverUploadMain';
 import CusomizedDeliveryReadyNaverViewMain from './component/customized_delivery_ready/CusomizedDeliveryReadyNaverViewMain';
+import CreateCustomizedHeaderMain from './component/customized_delivery_ready/CreateCustomizedHeaderMain';
 
 const theme = unstable_createMuiStrictModeTheme();
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/delivery-ready" exact component={DeliveryReadyUpload}></Route>
           <Route path="/delivery-ready/customized/upload" exact component={DeliveryReadyNaverUploadMain}></Route>
           <Route path="/delivery-ready/customized/view" exact component={CusomizedDeliveryReadyNaverViewMain}></Route>
+          <Route path="/delivery-ready/customized-header/create" exact component={CreateCustomizedHeaderMain}></Route>
       </ThemeProvider>
     </Router>
   );

@@ -149,6 +149,7 @@ const HeaderTh = styled.th`
 `;
 
 const BodyTr = styled.tr`
+    background: #fafaff;
 `;
 
 const BodyTd = styled.td`
@@ -201,8 +202,8 @@ const CustomizedDeliveryReadyNaverViewBody = (props) => {
                                     </Select>
                                 </FormControl>
                             </Box>
-                            <AddIcon />
-                            <EditIcon />
+                            <button onClick={(e) => props.__handleEventControl().customizedHeader().moveAddPage(e)}><AddIcon /></button>
+                            <button onClick={(e) => props.__handleEventControl().customizedHeader().moveEditPage(e)}><EditIcon /></button>
                         </FormInput>
                     </Form>
                     <DownloadForm onSubmit={(e) => props.__handleEventControl().storeExcelData().submit(e)}>
@@ -211,7 +212,7 @@ const CustomizedDeliveryReadyNaverViewBody = (props) => {
                     {/* <PageControlBtn type="button" onClick={() => props.__handleEventControl().movePage().customizedDeliveryReadyView()}>배송준비 업로드 <KeyboardArrowRightIcon /></PageControlBtn> */}
                 </UploadBar>
                 <TableContainer>
-                    <table className="table table-sm" style={{ tableLayout: 'fixed' }}>
+                    <table className="table table-sm" style={{ tableLayout: 'fixed', width: '0px' }}>
                         <thead>
                             <tr>
                                 {props.customHeader?.map((data, index) => {
@@ -222,13 +223,12 @@ const CustomizedDeliveryReadyNaverViewBody = (props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {console.log(props.customizedDetails)}
                             {props.customizedDetails?.map((data, index1) => {     
                                 return(
-                                    <BodyTr>
+                                    <BodyTr key={`custom_data` + index1}>
                                         {data.details?.map((data2, index2) => {
                                             return(
-                                                    <BodyTd key={'custom_data' + index1 + '_idx' + index2} className="col">{data2.custom_col_data != null ? data2.custom_col_data : ""}</BodyTd>
+                                                    <BodyTd key={'custom_data' + index1 + '_details' + index2} className="col large-cell">{data2.custom_col_data != null ? data2.custom_col_data : ""}</BodyTd>
                                             )
                                         })}
                                     </BodyTr>

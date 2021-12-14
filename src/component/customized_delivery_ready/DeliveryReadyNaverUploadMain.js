@@ -117,7 +117,7 @@ const DeliveryReadyNaverUploadMain = (props) => {
             movePage: function () {
                 return {
                     customizedDeliveryReadyView: async function () {
-                        props.history.replace('/delivery-ready/customized/view');
+                        props.history.push('/delivery-ready/customized/view');
                     }
                 }
             },

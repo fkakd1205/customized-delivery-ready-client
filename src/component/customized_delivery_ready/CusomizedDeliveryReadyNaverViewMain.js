@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import CustomizedDeliveryReadyNaverViewBody from './CustomizedDeliveryReadyNaverViewBody';
 import { customizedDeliveryReadyNaverDataConnect } from '../../data_connect/customizedDeliveryReadyNaverDataConnect';
 
-const CustomizedDeliveryReadyNaverViewMain = () => {
+const CustomizedDeliveryReadyNaverViewMain = (props) => {
     const [customizedDeliveryReadyData, setCustomizedDeliveryReadyData] = useState(null);
     const [customHeader, setCustomHeader] = useState(null);
     const [excelData, setExcelData] = useState(null);
@@ -74,6 +74,23 @@ const CustomizedDeliveryReadyNaverViewMain = () => {
                     submit: async function (e) {
                         e.preventDefault();
                         await __handleDataConnect().changeCustomizedOrderForm();
+                    }
+                }
+            },
+            customizedHeader: function () {
+                return {
+                    moveAddPage: function () {
+                        props.history.push('/delivery-ready/customized-header/create');
+                    },
+                    moveEditPage: function () {
+                        props.history.push('/delivery-ready/');
+                    }
+                }
+            },
+            refForm: function () {
+                return {
+                    selectRefForm: function () {
+                        
                     }
                 }
             }
