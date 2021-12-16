@@ -248,7 +248,7 @@ const DeleteBtn = styled.div`
     }
 `;
 
-const CreateCustomizedHeaderBody = (props) => {
+const ModifyCustomizedHeaderBody = (props) => {
     return (
         <>
             <BackBtn type='button'
@@ -264,7 +264,7 @@ const CreateCustomizedHeaderBody = (props) => {
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>
-                                <GroupTitle>발주서 유형 등록</GroupTitle>
+                                <GroupTitle>발주서 유형 수정</GroupTitle>
                             </ItemHeaderWrapper>
                             <BodyContainer>
 
@@ -307,4 +307,4 @@ const CreateCustomizedHeaderBody = (props) => {
 
 }
 
-export default withRouter(CreateCustomizedHeaderBody);
+export default withRouter(ModifyCustomizedHeaderBody);

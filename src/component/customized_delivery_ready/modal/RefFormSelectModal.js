@@ -68,7 +68,7 @@ const RefFormSelectModal = (props) => {
                                 {props.refFormData?.map((data, idx) => {
                                     return (
                                         <ListItem key={'ref_form_data1_' + idx} component="div" disablePadding>
-                                            <ListItemButton key={'ref_form_data2_' + idx}>
+                                            <ListItemButton key={'ref_form_data2_' + idx} style={{hover: 'red'}}>
                                                 <ListItemText key={'ref_form_data3_' + idx} primary={data.originColName} onClick={(e) => props.__handleEventControl().refForm().selectRefForm(data)}/>
                                             </ListItemButton>
                                         </ListItem>

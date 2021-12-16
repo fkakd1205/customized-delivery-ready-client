@@ -26,13 +26,19 @@ const customizedDeliveryReadyNaverDataConnect = () => {
         //         withCredentials: true
         //     })
         // },
-        searchCustomizedTableHeader: async function () {
-            return await axios.get(`/api/v1/delivery-ready/customize/header/list`, {
+        searchCustomizedTableHeader: async function (titleId) {
+            return await axios.get(`/api/v1/delivery-ready/customize/header/selected`, {
+                params: {
+                    titleId: titleId,
+                },
                 withCredentials: true
             });
         },
-        searchAllCustomDeliveryReadyItem: async function () {
+        searchSelectedCustomDeliveryReadyItem: async function (titleId) {
             return await axios.get(`/api/v1/delivery-ready/customize/naver/customized`, {
+                params: {
+                    titleId: titleId,
+                },
                 withCredentials: true
             });
         },
@@ -42,10 +48,14 @@ const customizedDeliveryReadyNaverDataConnect = () => {
             });
         },
         postCreateCustomTableHeaderList: async function (data) {
-            console.log(data);
             return await axios.post(`/api/v1/delivery-ready/customize/header/list`, data, {
                 withCredentials: true
             })
+        },
+        searchCustomizedTableHeaderTitle: async function () {
+            return await axios.get(`/api/v1/delivery-ready/customize/header-title/list`, {
+                withCredentials: true
+            });
         }
     }
 }

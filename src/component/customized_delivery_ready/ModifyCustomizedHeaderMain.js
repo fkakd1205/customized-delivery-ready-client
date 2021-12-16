@@ -3,32 +3,30 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router';
 import { Container } from '@material-ui/core';
-import CreateCustomizedHeaderBody from './CreateCustomizedHeaderBody';
+import ModifyCustomizedHeaderBody from './ModifyCustomizedHeaderBody';
 import RefFormSelectModal from './modal/RefFormSelectModal';
 
 import { customizedDeliveryReadyNaverDataConnect } from '../../data_connect/customizedDeliveryReadyNaverDataConnect';
 
 class CustomTableHeader {
-    constructor(title = '', titleId) {
+    constructor(title = '') {
         this.id = uuidv4();
         this.title = title;
-        this.customColName = '';
+        this.customName = '';
         this.refFormId = null;
-        this.customTableHeaderTitleId = titleId;
     }
 
     toJSON() {
         return {
             id: this.id,
             title: this.title,
-            customColName: this.customColName,
-            refFormId: this.refFormId,
-            customTableHeaderTitleId: this.customTableHeaderTitleId
+            customName: this.customName,
+            refFormId: this.refFormId
         }
     }
 }
 
-const CreateCustomizedHeaderMain = (props) => {
+const ModifyCustomizedHeaderMain = () => {
     const [customizedHeader, setCustomizedHeader] = useState(new CustomTableHeader().toJSON());
     const [customizedHeaderList, setCustomizedHeaderList] = useState([]);
     const [refFormSelectModalOpen, setRefFormSelectModalOpen] = useState(false);
@@ -60,11 +58,11 @@ const CreateCustomizedHeaderMain = (props) => {
                     })
             },
             postCreateCustomTableHeaderList: async function () {
+                console.log(customizedHeaderList);
                 await customizedDeliveryReadyNaverDataConnect().postCreateCustomTableHeaderList(customizedHeaderList)
                     .then(res => {
                         if(res.status === 200 && res.data && res.data.message === 'success') {
-                            alert('저장되었습니다.');
-                            props.history.replace('/delivery-ready/customized/view');
+                            setRefFormData(res.data.data);
                         }
                     })
                     .catch(err => {
@@ -158,11 +156,11 @@ const CreateCustomizedHeaderMain = (props) => {
 
     return (
         <>
-            <CreateCustomizedHeaderBody
+            <ModifyCustomizedHeaderBody
                 customizedHeaderList={customizedHeaderList}
                 
                 __handleEventControl={__handleEventControl}
-            ></CreateCustomizedHeaderBody>
+            ></ModifyCustomizedHeaderBody>
 
             <RefFormSelectModal
                 open={refFormSelectModalOpen}
@@ -175,4 +173,4 @@ const CreateCustomizedHeaderMain = (props) => {
     )
 }
 
-export default withRouter(CreateCustomizedHeaderMain);
+export default withRouter(ModifyCustomizedHeaderMain);

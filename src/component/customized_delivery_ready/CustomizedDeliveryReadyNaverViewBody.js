@@ -50,8 +50,10 @@ const FormTitle = styled.span`
     text-align: center;
 `;
 
-const FormInput = styled.span`
+const FormInput = styled.div`
     color: black;
+    display: flex;
+    vertical-align: middle;
 `;
 
 const ControlLabel = styled.label`
@@ -93,7 +95,7 @@ const ControlBtn = styled.button`
     font-size: 16px;
     font-weight: bold;
     vertical-align: middle;
-    background-color: rgba(122, 146, 218, 0.88);
+    background-color: rgb(102 117 163 / 88%);
     transition: opacity 0.1s linear 0s;
     &:hover {
         opacity: 0.8;
@@ -180,6 +182,18 @@ const PageControlBtn = styled.button`
     }
 `;
 
+const StorageControlBtn = styled.button`
+    background: #a2a9c1;
+    color:white;
+    border:1px solid #a2a9c1;
+    border-radius: 3px;
+    margin-left: 5px;
+
+    @media only screen and (max-width:576px ){
+        padding: 0;
+    }
+`;
+
 const CustomizedDeliveryReadyNaverViewBody = (props) => {
     return (
         <>
@@ -188,22 +202,25 @@ const CustomizedDeliveryReadyNaverViewBody = (props) => {
                     <Form>
                         <FormTitle>발주서 유형 선택</FormTitle>
                         <FormInput>
-                            <Box sx={{ minWidth: 150, maxWidth: 300 }}>
+                            <Box sx={{ minWidth: 200, maxWidth: 300 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel id="storage-select-id">title</InputLabel>
+                                    <InputLabel id="storage-select-id">Title</InputLabel>
                                     <Select
                                         labelId="storage-select-id"
                                         id="storage-select"
-                                        value={props.storageId}
+                                        value={props.selectedCustomTitle?.title || ''}
                                         label="storage-selector"
-                                        onChange={(e) => props.__handleEventControl().changeCustomizedOrderForm().submit(e)}
                                     >
-                                        <MenuItem value={props.customHeader}>테일로</MenuItem>
+                                        {props.customHeaderTitle?.map((data, idx) => {
+                                            return(
+                                                <MenuItem key={'custom_header_title_idx' + idx} value={data.title} onClick={(e) => props.__handleEventControl().customizedHeader().changeCustomTableHeader(e, data)}>{data.title}</MenuItem>
+                                            )
+                                        })}
                                     </Select>
                                 </FormControl>
                             </Box>
-                            <button onClick={(e) => props.__handleEventControl().customizedHeader().moveAddPage(e)}><AddIcon /></button>
-                            <button onClick={(e) => props.__handleEventControl().customizedHeader().moveEditPage(e)}><EditIcon /></button>
+                            <StorageControlBtn type="button" onClick={(e) => props.__handleEventControl().customizedHeader().moveAddPage(e)}><AddIcon /></StorageControlBtn>
+                            <StorageControlBtn type="button" onClick={(e) => props.__handleEventControl().customizedHeader().moveEditPage(e)}><EditIcon /></StorageControlBtn>
                         </FormInput>
                     </Form>
                     <DownloadForm onSubmit={(e) => props.__handleEventControl().storeExcelData().submit(e)}>
@@ -215,9 +232,9 @@ const CustomizedDeliveryReadyNaverViewBody = (props) => {
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '0px' }}>
                         <thead>
                             <tr>
-                                {props.customHeader?.map((data, index) => {
+                                {props.selectedCustomHeader?.map((data, index) => {
                                     return (
-                                        <HeaderTh key={'customHeaderIdx' + index} className="fiexed-header large-cell" scope="col">{data.customColName}</HeaderTh>
+                                        <HeaderTh key={'custom_header' + index} className="fiexed-header large-cell" scope="col">{data.customColName}</HeaderTh>
                                     )
                                 })}
                             </tr>

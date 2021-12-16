@@ -8,14 +8,16 @@ import { customizedDeliveryReadyNaverDataConnect } from '../../data_connect/cust
 
 const CustomizedDeliveryReadyNaverViewMain = (props) => {
     const [customizedDeliveryReadyData, setCustomizedDeliveryReadyData] = useState(null);
-    const [customHeader, setCustomHeader] = useState(null);
+    // const [customHeader, setCustomHeader] = useState(null);
     const [excelData, setExcelData] = useState(null);
     const [customizedDetails, setCustomizedDetails] = useState(null);
+    const [customHeaderTitle, setCustomHeaderTitle] = useState(null);
+    const [selectedCustomHeader, setSelectedCustomHeader] = useState(null);
+    const [selectedCustomTitle, setSelectedCustomTitle] = useState(null);
 
     useEffect(() => {
         async function fetchInit() {
-            await __handleDataConnect().getAllCustomTableHeader();
-            await __handleDataConnect().getAllCustomDeliveryReadyItem();
+            await __handleDataConnect().getAllCustomTableHeaderTitle();
         }
 
         fetchInit();
@@ -35,11 +37,11 @@ const CustomizedDeliveryReadyNaverViewMain = (props) => {
                         alert('undefined error. : changeCustomizedOrderForm');
                     })
             },
-            getAllCustomTableHeader : async function () {
-                await customizedDeliveryReadyNaverDataConnect().searchCustomizedTableHeader()
+            getSelectedCustomTableHeaderData : async function (titleId) {
+                await customizedDeliveryReadyNaverDataConnect().searchCustomizedTableHeader(titleId)
                     .then(res => {
                         if(res.status === 200 && res.data && res.data.message === 'success') {
-                            setCustomHeader(res.data.data);
+                            setSelectedCustomHeader(res.data.data);
                         }
                     })
                     .catch(err => {
@@ -47,12 +49,11 @@ const CustomizedDeliveryReadyNaverViewMain = (props) => {
                         alert('undefined error. : getAllCustomTableHeader');
                     })
             },
-            getAllCustomDeliveryReadyItem: async function () {
-                await customizedDeliveryReadyNaverDataConnect().searchAllCustomDeliveryReadyItem()
+            getSelectedCustomDeliveryReadyItem: async function (titleId) {
+                await customizedDeliveryReadyNaverDataConnect().searchSelectedCustomDeliveryReadyItem(titleId)
                     .then(res => {
                         if(res.status === 200 && res.data && res.data.message === 'success') {
                             let data = res.data.data;
-
                             let customizedData = data.map(r => r.customizedDeliveryReadyItem);
 
                             setCustomizedDeliveryReadyData(res.data.data);
@@ -61,7 +62,19 @@ const CustomizedDeliveryReadyNaverViewMain = (props) => {
                     })
                     .catch(err => {
                         console.log(err);
-                        alert('undefined error. : getAllCustomDeliveryReadyItem');
+                        alert('undefined error. : getSelectedCustomDeliveryReadyItem');
+                    })
+            },
+            getAllCustomTableHeaderTitle: async function () {
+                await customizedDeliveryReadyNaverDataConnect().searchCustomizedTableHeaderTitle()
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            setCustomHeaderTitle(res.data.data);
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        alert('undefined error. : getAllCustomTableHeader');
                     })
             }
         }
@@ -83,14 +96,13 @@ const CustomizedDeliveryReadyNaverViewMain = (props) => {
                         props.history.push('/delivery-ready/customized-header/create');
                     },
                     moveEditPage: function () {
-                        props.history.push('/delivery-ready/');
-                    }
-                }
-            },
-            refForm: function () {
-                return {
-                    selectRefForm: function () {
-                        
+                        props.history.push('/delivery-ready/customized-header/modify');
+                    },
+                    changeCustomTableHeader: async function (e, headerTitle) {
+                        e.preventDefault();
+                        await __handleDataConnect().getSelectedCustomTableHeaderData(headerTitle.id);
+                        setSelectedCustomTitle(headerTitle)
+                        await __handleDataConnect().getSelectedCustomDeliveryReadyItem(headerTitle.id);
                     }
                 }
             }
@@ -101,8 +113,10 @@ const CustomizedDeliveryReadyNaverViewMain = (props) => {
         <>
             <CustomizedDeliveryReadyNaverViewBody
                 customizedDeliveryReadyData={customizedDeliveryReadyData}
-                customHeader={customHeader}
+                customHeaderTitle={customHeaderTitle}
                 customizedDetails={customizedDetails}
+                selectedCustomHeader={selectedCustomHeader}
+                selectedCustomTitle={selectedCustomTitle}
 
                 __handleEventControl={__handleEventControl}
             ></CustomizedDeliveryReadyNaverViewBody>
