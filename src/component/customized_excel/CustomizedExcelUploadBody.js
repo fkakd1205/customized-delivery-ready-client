@@ -11,7 +11,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 const Container = styled.div`
     margin-top: 80px;
     margin-bottom: 120px;
-    padding: 0 10%;
+    padding: 0 5%;
 `;
 
 const BackBtn = styled.button`
@@ -86,6 +86,8 @@ const GroupTitle = styled.div`
 
 const BodyWrapper = styled.div`
     padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 
     .icon-dot, .icon-must {
         display: inline-block;
@@ -100,6 +102,10 @@ const BodyWrapper = styled.div`
         margin-left: 5px;
         width: 6px;
         height: 6px;
+    }
+
+    .row-start-number-input {
+        width: 20%;
     }
 `;
 
@@ -127,7 +133,7 @@ const ItemContainer = styled.div`
 const CommonInputEl = styled.input`
     font-size: 1.2rem;
     border: none;
-    width: 30%;
+    width: 50%;
     padding: 10px;
     border-bottom: 1px solid #ced4da;
     &:focus{
@@ -162,7 +168,7 @@ const ItemHeaderWrapper = styled.div`
 
 const DataWrapper = styled.div`
     padding: 10px;
-    margin-bottom: 10px;
+    margin: 20px;
     border-radius: 10px;
     min-height: 300px;
     padding: 16px;
@@ -177,8 +183,8 @@ const DataWrapper = styled.div`
 `;
 
 const DataTitle = styled.div`
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.1rem;
+    font-weight: 500;
     padding:15px;
     @media only screen and (max-width:425px){
         padding: 15px 0;
@@ -189,9 +195,31 @@ const DataGroup = styled.div`
     padding: 10px;
     text-align: center;
     display: grid;
-    grid-template-columns: repeat(auto-fill, 40% 5% 40% 5%);
+    grid-template-columns: repeat(3, 1fr);
+    place-content: center;
+    justify-content: space-evenly;
+
+    & .add-cell-btn {
+        grid-column: span 3;
+    }
+`;
+
+const UploadDetailGroup = styled.div`
+    padding: 10px;
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     place-content: center;
 `;
+
+const DownloadDetailGroup = styled.div`
+    padding: 10px;
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    place-content: center;
+`;
+
 
 const CustomDataGroup = styled.div`
     text-align: center;
@@ -252,8 +280,8 @@ const UploadBar = styled.div`
     color: white;
     width: 100%;
     height: auto;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     border-radius: 5px;
     background-color: rgba(122, 123, 218, 0.125);
     margin-bottom: 5px;
@@ -272,7 +300,6 @@ const ControlLabel = styled.label`
     width: 240px;
     padding: 10px;
     margin: 4px;
-    float: right;
     color: #444;
     text-align: center;
     vertical-align: middle;
@@ -337,7 +364,7 @@ const CustomizedExcelUploadBody = (props) => {
                         <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
                         <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.__handleEventControl().uploadExcelData().submit(e)} />
                     </Form>
-                    <Form onClick={(e) => props.__handleEventControl().downloadExcelData(e)}>
+                    <Form onSubmit={(e) => props.__handleEventControl().downloadExcelData().submit(e)}>
                         <ControlBtn type="submit">엑셀 파일 다운로드</ControlBtn>
                     </Form>
                 </UploadBar>
@@ -348,38 +375,83 @@ const CustomizedExcelUploadBody = (props) => {
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>
-                                <GroupTitle>UPLOAD</GroupTitle>
+                                <GroupTitle>엑셀 변환기</GroupTitle>
                             </ItemHeaderWrapper>
                             <BodyContainer>
-
+                                {console.log(props.headerDetail)}
                                 <BodyWrapper>
                                     <div className="input-group mb-3">
                                         <DataTitle>업로드 엑셀 타이틀</DataTitle>
-                                        <CommonInputEl type="text" name='storageTitle'
-                                            // value={props.uploadExcelTitle} onChange={(e) => props.__handleEventControl().uploadExcelTitle().onChangeInputValue(e)} 
+                                        <CommonInputEl type="text" name='uploadHeaderTitle'
+                                            value={props.headerDetail.uploadHeaderTitle} onChange={(e) => props.__handleEventControl().uploadExcelTitle().onChangeInputValue(e)}
                                         />
                                     </div>
-                                </BodyWrapper>
-                            </BodyContainer>
-                        </ItemWrapper>
-                    </ItemContainer>
-
-
-                    <ItemContainer>
-                        <ItemWrapper>
-                            <ItemHeaderWrapper>
-                                <GroupTitle>DOWNLOAD</GroupTitle>
-                            </ItemHeaderWrapper>
-                            <BodyContainer>
-
-                                <BodyWrapper>
                                     <div className="input-group mb-3">
                                         <DataTitle>다운로드 엑셀 타이틀</DataTitle>
-                                        <CommonInputEl type="text" name='storageTitle'
-                                            // value={props.downloadExcelTitle} onChange={(e) => props.__handleEventControl().donwloadExcelTitle().onChangeInputValue(e)} 
+                                        <CommonInputEl type="text" name='downloadHeaderTitle'
+                                            value={props.headerDetail.downloadHeaderTitle} onChange={(e) => props.__handleEventControl().downloadExcelTitle().onChangeInputValue(e)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <span>데이터 시작 행</span>
+                                        <CommonInputEl type="number" name='rowStartNumber' className="row-start-number-input"
+                                            value={props.headerDetail.rowStartNumber} onChange={(e) => props.__handleEventControl().downloadExcelTitle().onChangeInputValue(e)}
                                         />
                                     </div>
                                 </BodyWrapper>
+
+
+                                <DataWrapper>
+                                    <DataGroup>
+                                        <UploadDetailGroup>
+                                            {props.headerDetail.uploadHeaderDetail.details?.map((data) => {
+                                                return (
+                                                    <>
+                                                        <div>
+                                                            <DataInputEl type="text" name='headerName' value={data.headerName} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeUploadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                        <div>
+                                                            <DataInputEl type="text" name='dataType' value={data.dataType} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeUploadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                        <div>
+                                                            <DataInputEl type="number" name='cellNumber' value={data.cellNumber} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeUploadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                    </>
+                                                )
+                                            })}
+                                        </UploadDetailGroup>
+                                        <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
+                                        <DownloadDetailGroup>
+                                            {props.headerDetail.downloadHeaderDetail.details?.map((data) => {
+                                                return (
+                                                    <>
+                                                        <div>
+                                                            <DataInputEl type="text" name='headerName' value={data.headerName} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeDownloadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                        <div>
+                                                            <DataInputEl type="text" name='dataType' value={data.dataType} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeDownloadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                        <div>
+                                                            <DataInputEl type="number" name='targetCellNumber' value={data.targetCellNumber} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeDownloadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                        <div>
+                                                            <DataInputEl type="text" name='fixedValue' value={data.fixedValue} onChange={(e) => props.__handleEventControl().customizedHeader().onChangeDownloadExcelInputValue(e, data.headerId)} required></DataInputEl>
+                                                        </div>
+                                                        <DeleteBtn><RemoveCircleOutlineIcon type="button" fontSize="large" onClick={(e) => props.__handleEventControl().customizedHeader().deleteCustomizedCell(e, data.headerId)} /></DeleteBtn>
+                                                    </>
+                                                )
+                                            })}
+                                        </DownloadDetailGroup>
+                                    </DataGroup>
+
+                                    <DataGroup>
+                                        <div className="add-cell-btn">
+                                            <AddCircleOutlineIcon type="button" fontSize="large"
+                                                onClick={(e) => props.__handleEventControl().customizedHeader().addCustomizedCell(e)}
+                                            />
+                                        </div>
+                                    </DataGroup>
+                                </DataWrapper>
                             </BodyContainer>
                         </ItemWrapper>
                     </ItemContainer>
