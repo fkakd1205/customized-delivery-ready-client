@@ -279,7 +279,7 @@ const CustomizedExcelUploadMain = () => {
                     .catch(err => {
                         console.log(err);
                     });
-            },
+            }
         }
     }
 
@@ -315,7 +315,7 @@ const CustomizedExcelUploadMain = () => {
                     }
                 }
             },
-            downloadExcelData: async function () {
+            downloadExcelData: function () {
                 return {
                     submit: async function (e) {
                         e.preventDefault();

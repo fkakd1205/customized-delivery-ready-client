@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'react-router';
 
@@ -197,7 +197,8 @@ const DataGroup = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     place-content: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    overflow: scroll;
 
     & .add-cell-btn {
         grid-column: span 3;
@@ -355,7 +356,58 @@ const Input = styled.input`
     display: none;
 `;
 
+// const initialExcelUploadHeader = null;
+
+// const excelUploadHeaderReducer = (state, action) =>{
+//     switch(action.type){
+//         case 'INIT_DATA':
+//             return action.payload;
+//         case 'CHANGE_DATA':
+//             return {
+//                 ...state,
+//                 [action.payload.tagName]:action.payload.value
+//             }
+//         default : return {...state};
+//     }
+// }
+
 const CustomizedExcelUploadBody = (props) => {
+    // const [excelUploadHeader, dispatchExcelUploadHeader] = useReducer(excelUploadHeaderReducer, initialExcelUploadHeader);
+    // const [hello, setHello] = useState(null);
+    // const [testModalOpen, setTestModalOpen] = useState(false);
+
+    // async function newFunction(){
+    //     let data = await getExcelData();
+    //     // setHello('hello');
+    //     dispatchExcelUploadHeader({
+    //         type:'INIT_DATA',
+    //         payload:data
+    //     })
+    // }
+
+    // function onValueChange(e){
+    //     dispatchExcelUploadHeader({
+    //         type:'CHANGE_DATA',
+    //         payload:{
+    //             tagName: e.target.name,
+    //             value: e.target.value
+    //         }
+    //     })
+    // }
+
+    // function onTestModalOpen(){
+    //     setTestModalOpen(true)
+    // }
+
+    // function onTestModalClose(){
+    //     setTestModalOpen(false)
+    // }
+
+    // function onSubmit(e){
+    //     e.preventDefault();
+    //     props.onSubmit(excelUploadHeader);
+    // }
+
     return (
         <>
            <Container className='container'>
@@ -364,9 +416,10 @@ const CustomizedExcelUploadBody = (props) => {
                         <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
                         <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.__handleEventControl().uploadExcelData().submit(e)} />
                     </Form>
-                    <Form onSubmit={(e) => props.__handleEventControl().downloadExcelData().submit(e)}>
-                        <ControlBtn type="submit">엑셀 파일 다운로드</ControlBtn>
-                    </Form>
+                    {/* <Form onSubmit={(e) => props.__handleEventControl().downloadExcelData().submit(e)}> */}
+                        {/* <ControlBtn type="submit">엑셀 파일 다운로드</ControlBtn> */}
+                        <ControlBtn type="button" onClick={(e) => props.__handleEventControl().downloadExcelData().submit(e)}>엑셀 파일 다운로드</ControlBtn>
+                    {/* </Form> */}
                 </UploadBar>
                 <form onSubmit={(e) => props.__handleEventControl().customizedHeader().submit(e)} >
                     <CreateBtn type='submit' disabled={props.isSubmit}>
@@ -378,7 +431,6 @@ const CustomizedExcelUploadBody = (props) => {
                                 <GroupTitle>엑셀 변환기</GroupTitle>
                             </ItemHeaderWrapper>
                             <BodyContainer>
-                                {console.log(props.headerDetail)}
                                 <BodyWrapper>
                                     <div className="input-group mb-3">
                                         <DataTitle>업로드 엑셀 타이틀</DataTitle>
@@ -404,7 +456,16 @@ const CustomizedExcelUploadBody = (props) => {
                                 <DataWrapper>
                                     <DataGroup>
                                         <UploadDetailGroup>
-                                            {props.headerDetail.uploadHeaderDetail.details?.map((data) => {
+                                            <div>
+                                                <div type="text">기존 헤더명</div>
+                                            </div>
+                                            <div>
+                                                <div type="text">데이터 타입</div>
+                                            </div>
+                                            <div>
+                                                <div type="text">기존 헤더순서</div>
+                                            </div>
+                                            {props.headerDetail.uploadHeaderDetail.details?.map((data, uploadDetailIdx) => {
                                                 return (
                                                     <>
                                                         <div>
@@ -422,7 +483,20 @@ const CustomizedExcelUploadBody = (props) => {
                                         </UploadDetailGroup>
                                         <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
                                         <DownloadDetailGroup>
-                                            {props.headerDetail.downloadHeaderDetail.details?.map((data) => {
+                                            <div>
+                                                <div type="text">설정 헤더명</div>
+                                            </div>
+                                            <div>
+                                                <div type="text">데이터 타입</div>
+                                            </div>
+                                            <div>
+                                                <div type="text">기존 헤더순서</div>
+                                            </div>
+                                            <div>
+                                                <div type="text">고정값</div>
+                                            </div>
+                                            <div></div>
+                                            {props.headerDetail.downloadHeaderDetail.details?.map((data, downloadDetailIdx) => {
                                                 return (
                                                     <>
                                                         <div>
@@ -439,8 +513,8 @@ const CustomizedExcelUploadBody = (props) => {
                                                         </div>
                                                         <DeleteBtn><RemoveCircleOutlineIcon type="button" fontSize="large" onClick={(e) => props.__handleEventControl().customizedHeader().deleteCustomizedCell(e, data.headerId)} /></DeleteBtn>
                                                     </>
-                                                )
-                                            })}
+                                                    )
+                                                })}
                                         </DownloadDetailGroup>
                                     </DataGroup>
 
@@ -456,6 +530,7 @@ const CustomizedExcelUploadBody = (props) => {
                         </ItemWrapper>
                     </ItemContainer>
                 </form>
+                
             </Container>
         </>
     )

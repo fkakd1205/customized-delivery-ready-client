@@ -58,7 +58,7 @@ const customizedDeliveryReadyNaverDataConnect = () => {
             });
         },
         downloadCustomizedExcelFile: async function (data) {
-            return await axios.post("/api/v1/customized-excel/download", data, {
+            return await axios.post(`/api/v1/customized-excel/download`, data, {
                 responseType: 'blob',
                 withCredentials:true
             })
