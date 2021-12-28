@@ -9,6 +9,7 @@ const ExcelTranslatorCommonModal = (props) => {
                 onClose={() => props.onClose()}
                 maxWidth={props.maxWidth || 'xs'}
                 fullWidth={props.fullWidth || true}
+                disableEnforceFocus
             >
                 {props.children}
             </Dialog>

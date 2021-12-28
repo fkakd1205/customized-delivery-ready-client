@@ -10,7 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
 import CreateUploadExcelHeaderComponent from "./modal/CreateUploadExcelHeaderComponent";
-import { QrCodeScannerOutlined } from "@mui/icons-material";
+import CreateDownloadExcelHeaderComponent from "./modal/CreateDownloadExcelHeaderComponent";
 
 const Container = styled.div`
     margin-top: 80px;
@@ -151,7 +151,7 @@ const Input = styled.input`
     display: none;
 `;
 
-const initialUploadExcelHeader = null;
+const initialExcelHeader = null;
 
 const uploadExcelHeaderReducer = (state, action) => {
     switch(action.type) {
@@ -209,17 +209,36 @@ class UploadExcelHeader {
 }
 
 const ExcelTranslatorBody = (props) => {
-    const [uploadExcelHeader, dispatchUploadExcelHeader] = useReducer(uploadExcelHeaderReducer, initialUploadExcelHeader);
-    const [customizedHeaderList, setCustomizedHeaderList] = useState([new UploadHeaderDetail().toJSON()]);
+    const [uploadExcelHeader, dispatchUploadExcelHeader] = useReducer(uploadExcelHeaderReducer, initialExcelHeader);
 
-    const [excelTranslatorCommonModalOpen, setExcelTranslatorCommonModalOpen] = useState(false);
+    const [uploadCustomizedHeaderList, setUploadCustomizedHeaderList] = useState([new UploadHeaderDetail().toJSON()]);
+    const [selectedUploadHeader, setSelectedUploadHeader] = useState(null);
 
-    const onExcelTranslatorCommonModalOpen = () => {
-        setExcelTranslatorCommonModalOpen(true);
+    const [createUploadExcelHeaderModalOpen, setCreateUploadExcelHeaderModalOpen] = useState(false);
+    const [createDownloadExcelHeaderModalOpen, setCreateDownloadExcelHeaderModalOpen] = useState(false);
+
+    const onCreateUploadExcelHeaderModalOpen = () => {
+        setCreateUploadExcelHeaderModalOpen(true);
     }
 
-    const onExcelTranslatorCommonModalClose = () => {
-        setExcelTranslatorCommonModalOpen(false);
+    const onCreateUploadExcelHeaderModalClose = () => {
+        setCreateUploadExcelHeaderModalOpen(false);
+        setUploadCustomizedHeaderList([new UploadHeaderDetail().toJSON()]);
+        dispatchUploadExcelHeader({
+            type:'CLEAR'
+        });
+    }
+
+    const onCreateDownloadExcelHeaderModalOpen = () => {
+        setCreateDownloadExcelHeaderModalOpen(true);
+    }
+
+    const onCreateDownloadExcelHeaderModalClose = () => {
+        setCreateDownloadExcelHeaderModalOpen(false);
+        setUploadCustomizedHeaderList([new UploadHeaderDetail().toJSON()]);
+        dispatchUploadExcelHeader({
+            type:'CLEAR'
+        });
     }
 
     const onChangeInputValue = (e) => {
@@ -235,7 +254,7 @@ const ExcelTranslatorBody = (props) => {
     const onChangeUploadInputValue = (e, headerId) => {
         onChangeInputValue(e);
 
-        setCustomizedHeaderList(customizedHeaderList.map(r => {
+        setUploadCustomizedHeaderList(uploadCustomizedHeaderList.map(r => {
             if(r.id === headerId) {
                 return {
                     ...r,
@@ -252,13 +271,13 @@ const ExcelTranslatorBody = (props) => {
             addCell: function (e) {
                 e.preventDefault();
 
-                setCustomizedHeaderList(customizedHeaderList.concat(new UploadHeaderDetail().toJSON()));
+                setUploadCustomizedHeaderList(uploadCustomizedHeaderList.concat(new UploadHeaderDetail().toJSON()));
             },
             deleteCell: function (e, headerId) {
                 e.preventDefault();
 
-                if(customizedHeaderList.length > 1){
-                    setCustomizedHeaderList(customizedHeaderList.filter(r => r.id !== headerId));
+                if(uploadCustomizedHeaderList.length > 1){
+                    setUploadCustomizedHeaderList(uploadCustomizedHeaderList.filter(r => r.id !== headerId));
                 }
             },
             submit: async function (e) {
@@ -267,10 +286,59 @@ const ExcelTranslatorBody = (props) => {
                 let excelHeader = new UploadExcelHeader().toJSON();
 
                 excelHeader.uploadHeaderTitle = uploadExcelHeader.storageTitle;
-                excelHeader.uploadHeaderDetail.details = customizedHeaderList;
+                excelHeader.uploadHeaderDetail.details = uploadCustomizedHeaderList;
                 excelHeader.rowStartNumber = uploadExcelHeader.rowStartNumber;
 
                 await props.__handleEventControl().uploadHeader().createOne(excelHeader);
+                onCreateUploadExcelHeaderModalClose();
+            },
+            selectedUploadHeader: async function (e, data) {
+                e.preventDefault();
+
+                setSelectedUploadHeader(props.excelTranslatorHeaderList.filter(r => r.id === data.id)[0]);
+            }
+        }
+    }
+
+    const downloadExcel = () => {
+        return {
+            addCell: function (e) {
+                e.preventDefault();
+
+                setUploadCustomizedHeaderList(uploadCustomizedHeaderList.concat(new UploadHeaderDetail().toJSON()));
+            },
+            deleteCell: function (e, headerId) {
+                e.preventDefault();
+
+                if(uploadCustomizedHeaderList.length > 1){
+                    setUploadCustomizedHeaderList(uploadCustomizedHeaderList.filter(r => r.id !== headerId));
+                }
+            },
+            submit: async function (e) {
+                e.preventDefault();
+
+                let excelHeader = selectedUploadHeader;
+                
+                excelHeader.downloadHeaderTitle = uploadExcelHeader.storageTitle;
+                excelHeader.downloadHeaderDetail.details = uploadCustomizedHeaderList;
+            
+                await props.__handleEventControl().uploadHeader().updateOne(excelHeader);
+
+                onCreateDownloadExcelHeaderModalClose();
+            },
+            selectedUploadHeaderName: async function (e, customizedDataId, uploadHeaderDetailData) {
+                e.preventDefault();
+
+                setUploadCustomizedHeaderList(uploadCustomizedHeaderList.map(r => {
+                    if(r.id === customizedDataId) {
+                        r.targetCellNumber = uploadHeaderDetailData.cellNumber;
+                        r.refUploadHeaderName = uploadHeaderDetailData.headerName;
+                        r.uploadHeaderId = uploadHeaderDetailData.id;
+                        return r;
+                    }else{
+                        return r;
+                    }
+                }));
             }
         }
     }
@@ -291,21 +359,21 @@ const ExcelTranslatorBody = (props) => {
                                             <Select
                                                 labelId="storage-select-id"
                                                 id="storage-select"
-                                                value={props.selectedCustomTitle?.title || ''}
+                                                value={selectedUploadHeader?.uploadHeaderTitle || ''}
                                                 label="storage-selector"
                                             >
-                                                {/* {props.customHeaderTitle?.map((data, idx) => {
+                                                {props.excelTranslatorHeaderList?.map((data, idx) => {
                                                     return (
-                                                        <MenuItem key={'custom_header_title_idx' + idx} value={data.title} onClick={(e) => props.__handleEventControl().customizedHeader().changeCustomTableHeader(e, data)}>{data.title}</MenuItem>
+                                                        <MenuItem key={'excel_translator_upload_title' + idx} value={data.uploadHeaderTitle} onClick={(e) => uploadExcel().selectedUploadHeader(e, data)}>{data.uploadHeaderTitle}</MenuItem>
                                                 )
-                                                })} */}
+                                                })}
                                             </Select>
                                         </FormControl>
                                     </Box>
                                 </div>
                             </FormInput>
                             <div>
-                                <StorageControlBtn type="button" onClick={() => onExcelTranslatorCommonModalOpen()}><AddIcon /></StorageControlBtn>
+                                <StorageControlBtn type="button" onClick={() => onCreateUploadExcelHeaderModalOpen()}><AddIcon /></StorageControlBtn>
                                 <StorageControlBtn type="button"><EditIcon /></StorageControlBtn>
                             </div>
                         </TitleSelector>
@@ -320,21 +388,17 @@ const ExcelTranslatorBody = (props) => {
                                             <Select
                                                 labelId="storage-select-id"
                                                 id="storage-select"
-                                                // value={props.selectedCustomTitle?.title || ''}
+                                                value={selectedUploadHeader?.downloadHeaderTitle || ''}
                                                 label="storage-selector"
                                             >
-                                                {/* {props.customHeaderTitle?.map((data, idx) => {
-                                                return (
-                                                <MenuItem key={'custom_header_title_idx' + idx} value={data.title} onClick={(e) => props.__handleEventControl().customizedHeader().changeCustomTableHeader(e, data)}>{data.title}</MenuItem>
-                                                )
-                                                })} */}
+                                                <MenuItem value={selectedUploadHeader?.downloadHeaderTitle} onClick={(e) => uploadExcel().selectedUploadHeader(e)}>{selectedUploadHeader?.downloadHeaderTitle}</MenuItem>
                                             </Select>
                                         </FormControl>
                                     </Box>
                                 </div>
                             </FormInput>
                             <div>
-                                <StorageControlBtn type="button"><AddIcon /></StorageControlBtn>
+                                <StorageControlBtn type="button" onClick={() => onCreateDownloadExcelHeaderModalOpen()}><AddIcon /></StorageControlBtn>
                                 <StorageControlBtn type="button"><EditIcon /></StorageControlBtn>
                             </div>
                         </TitleSelector>
@@ -342,7 +406,7 @@ const ExcelTranslatorBody = (props) => {
                     <TranslatorBtnBox>
                         <Form>
                             <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
-                            <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.__handleEventControl().uploadExcelData().submit(e)} />
+                            <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.__handleEventControl().uploadExcelData().submit(e, selectedUploadHeader)} />
                         </Form>
                         <Form onSubmit={(e) => props.__handleEventControl().storeExcelData().submit(e)}>
                             <ControlBtn type="submit">발주서 다운로드</ControlBtn>
@@ -351,21 +415,36 @@ const ExcelTranslatorBody = (props) => {
                 </DataWrapper>
             </Container>
 
-            {/* Modal */}
+            {/* Upload Header Modal */}
             <ExcelTranslatorCommonModal
-                open={excelTranslatorCommonModalOpen}
-                onClose={() => onExcelTranslatorCommonModalClose()}
+                open={createUploadExcelHeaderModalOpen}
+                onClose={() => onCreateUploadExcelHeaderModalClose()}
                 maxWidth={'xs'}
                 fullWidth={true}
             >
                 <CreateUploadExcelHeaderComponent
                     uploadExcelHeader={uploadExcelHeader}
-                    customizedHeaderList={customizedHeaderList}
+                    uploadCustomizedHeaderList={uploadCustomizedHeaderList}
                     uploadExcel={uploadExcel}
                     onChangeInputValue={onChangeInputValue}
                     onChangeUploadInputValue={onChangeUploadInputValue}
-                    uploadHeaderList={props.uploadHeaderList}
                 ></CreateUploadExcelHeaderComponent>
+            </ExcelTranslatorCommonModal>
+
+            {/* Download Header Modal */}
+            <ExcelTranslatorCommonModal
+                open={createDownloadExcelHeaderModalOpen}
+                onClose={() => onCreateDownloadExcelHeaderModalClose()}
+                maxWidth={'md'}
+                fullWidth={true}
+            >
+                <CreateDownloadExcelHeaderComponent
+                    selectedUploadHeader={selectedUploadHeader}
+                    uploadCustomizedHeaderList={uploadCustomizedHeaderList}
+                    downloadExcel={downloadExcel}
+                    onChangeInputValue={onChangeInputValue}
+                    onChangeUploadInputValue={onChangeUploadInputValue}
+                ></CreateDownloadExcelHeaderComponent>
             </ExcelTranslatorCommonModal>
         </>
     )

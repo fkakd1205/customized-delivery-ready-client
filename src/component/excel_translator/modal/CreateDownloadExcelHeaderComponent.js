@@ -3,6 +3,12 @@ import styled from "styled-components";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 const Container = styled.div`
 
@@ -96,7 +102,7 @@ const DataInputEl = styled.input`
 
 const CustomDataGroup = styled.div`
     text-align: center;
-    width: 95%;
+    width: 100%;
     padding: 10px;
 
     &:hover{
@@ -115,14 +121,27 @@ const SubmitBtn = styled.button`
     border: none;
     border-radius: 50%;
     background-color: #c7cee3ee;
-    margin: 10px;
+    margin: 10px 45px;
 `;
 
-const DataGroup = styled.div`
+const UploadDataGroup = styled.div`
     padding: 10px;
     text-align: center;
     display: grid;
-    grid-template-columns: 1fr 7fr 1fr;
+    grid-template-columns: 1fr 7fr;
+    text-align: center;
+    align-items: center;
+
+    & .add-cell-btn {
+        grid-column: span 3;
+    }
+`;
+
+const DownloadDataGroup = styled.div`
+    padding: 10px;
+    text-align: center;
+    display: grid;
+    grid-template-columns: 7fr 1fr;
     text-align: center;
     align-items: center;
 
@@ -152,15 +171,36 @@ const HeaderInfo = styled.div`
     place-content: space-evenly center;
 `;
 
-const CreateUploadExcelHeaderComponent = (props) => {
+const DataGroup = styled.div`
+    display: grid;
+    grid-template-columns: 45% 10% 45%;
+    place-content: space-evenly center;
+`;
+
+const ArrowSpan = styled.div`
+    height: 100%;
+
+    /* @media only screen and (max-width:576px){
+        transform: rotate(90deg);
+    } */
+`;
+
+const FormInput = styled.div`
+    color: black;
+    display: flex;
+    background-color: white;
+    vertical-align: middle;
+`;
+
+const CreateDownloadExcelHeaderComponent = (props) => {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.uploadExcel().submit(e)}>
+                <form onSubmit={(e) => props.downloadExcel().submit(e)}>
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>
-                                <GroupTitle>업로드 엑셀 유형 등록</GroupTitle>
+                                <GroupTitle>다운로드 엑셀 유형 등록</GroupTitle>
                                 <SubmitBtn type="submit"><AddTaskIcon /></SubmitBtn>
                             </ItemHeaderWrapper>
                         </ItemWrapper>
@@ -174,22 +214,42 @@ const CreateUploadExcelHeaderComponent = (props) => {
                                 required
                             />
                         </HeaderInfo>
-                        <HeaderInfo className="input-group mb-3">
-                            <DataTitle>데이터 시작 행</DataTitle>
-                            <CommonInputEl type="number" name='rowStartNumber'
-                                value={props.uploadExcelHeader?.rowStartNumber}
-                                onChange={(e) => props.onChangeInputValue(e)}
-                                required
-                            />
-                        </HeaderInfo>
                         <DataWrapper>
                             {props.uploadCustomizedHeaderList?.map((data, idx) => {
                                 return (
                                     <React.Fragment key={data.id}>
                                         <DataGroup>
-                                            <div>{idx+1}</div>
-                                            <DataInputEl type="text" name='uploadHeaderName' placeholder='업로드 엑셀 항목명' onChange={(e) => props.onChangeUploadInputValue(e, data.id)} required></DataInputEl>
-                                            <DeleteBtn><RemoveCircleOutlineIcon type="button" sx={{ fontSize: 30}} onClick={(e) => props.uploadExcel().deleteCell(e, data.id)} /></DeleteBtn>
+                                            <UploadDataGroup>
+                                                <div>{idx + 1}</div>
+                                                <FormInput>
+                                                    <div style={{ width: '100%' }}>
+                                                        <Box sx={{ display: 'flex' }}>
+                                                            <FormControl fullWidth>
+                                                                <InputLabel id="header-select-id">Title</InputLabel>
+                                                                <Select
+                                                                    labelId="header-select-id"
+                                                                    id="header-select"
+                                                                    label="header-selector"
+                                                                    value={data.refUploadHeaderName || ''}
+                                                                >
+                                                                    {props.selectedUploadHeader?.uploadHeaderDetail.details.map((data2, idx2) => {
+                                                                        return (
+                                                                            <MenuItem key={'excel_translator_upload_title' + idx2} value={data2.headerName} 
+                                                                                onClick={(e) => props.downloadExcel().selectedUploadHeaderName(e, data.id, data2)}
+                                                                            >{data2.headerName}</MenuItem>
+                                                                        )
+                                                                    })}
+                                                                </Select>
+                                                            </FormControl>
+                                                        </Box>
+                                                    </div>
+                                                </FormInput>
+                                            </UploadDataGroup>
+                                            <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
+                                            <DownloadDataGroup>
+                                                <DataInputEl type="text" name='uploadHeaderName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeUploadInputValue(e, data.id)} required></DataInputEl>
+                                                <DeleteBtn><RemoveCircleOutlineIcon type="button" sx={{ fontSize: 30 }} onClick={(e) => props.downloadExcel().deleteCell(e, data.id)} /></DeleteBtn>
+                                            </DownloadDataGroup>
                                         </DataGroup>
                                     </React.Fragment>
                                 )
@@ -197,7 +257,7 @@ const CreateUploadExcelHeaderComponent = (props) => {
 
                             <CustomDataGroup>
                                 <AddCircleOutlineIcon type="button" sx={{ fontSize: 30}}
-                                    onClick={(e) => props.uploadExcel().addCell(e)}
+                                    onClick={(e) => props.downloadExcel().addCell(e)}
                                 />
                             </CustomDataGroup>
                         </DataWrapper>
@@ -208,4 +268,4 @@ const CreateUploadExcelHeaderComponent = (props) => {
     ) 
 }
 
-export default CreateUploadExcelHeaderComponent;
+export default CreateDownloadExcelHeaderComponent;
