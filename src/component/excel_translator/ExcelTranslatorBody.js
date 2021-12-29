@@ -182,6 +182,26 @@ class UploadHeaderDetail {
     }
 }
 
+class DownloadHeaderDetail {
+    constructor() {
+        this.id = uuidv4();
+        this.headerName = '';
+        this.targetCellNumber = -1;
+        this.fixedValue = '';
+        this.uploadHeaderId = null;
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            headerName: this.headerName,
+            targetCellNumber: this.targetCellNumber,
+            fixedValue: this.fixedValue,
+            uploadHeaderId: this.uploadheaderId
+        }
+    }
+}
+
 class UploadExcelHeader {
     constructor() {
         this.id = uuidv4();
@@ -211,34 +231,34 @@ class UploadExcelHeader {
 const ExcelTranslatorBody = (props) => {
     const [uploadExcelHeader, dispatchUploadExcelHeader] = useReducer(uploadExcelHeaderReducer, initialExcelHeader);
 
-    const [uploadCustomizedHeaderList, setUploadCustomizedHeaderList] = useState([new UploadHeaderDetail().toJSON()]);
+    const [uploadCustomizedHeaderList, setUploadCustomizedHeaderList] = useState([]);
     const [selectedUploadHeader, setSelectedUploadHeader] = useState(null);
 
     const [createUploadExcelHeaderModalOpen, setCreateUploadExcelHeaderModalOpen] = useState(false);
     const [createDownloadExcelHeaderModalOpen, setCreateDownloadExcelHeaderModalOpen] = useState(false);
 
+    const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
+
     const onCreateUploadExcelHeaderModalOpen = () => {
         setCreateUploadExcelHeaderModalOpen(true);
+        setUploadCustomizedHeaderList([new UploadHeaderDetail().toJSON()]);
     }
 
     const onCreateUploadExcelHeaderModalClose = () => {
         setCreateUploadExcelHeaderModalOpen(false);
         setUploadCustomizedHeaderList([new UploadHeaderDetail().toJSON()]);
-        dispatchUploadExcelHeader({
-            type:'CLEAR'
-        });
+        dispatchUploadExcelHeader({ type:'CLEAR' });
     }
 
     const onCreateDownloadExcelHeaderModalOpen = () => {
         setCreateDownloadExcelHeaderModalOpen(true);
+        setUploadCustomizedHeaderList([new DownloadHeaderDetail().toJSON()]);
     }
 
     const onCreateDownloadExcelHeaderModalClose = () => {
         setCreateDownloadExcelHeaderModalOpen(false);
-        setUploadCustomizedHeaderList([new UploadHeaderDetail().toJSON()]);
-        dispatchUploadExcelHeader({
-            type:'CLEAR'
-        });
+        setUploadCustomizedHeaderList([new DownloadHeaderDetail().toJSON()]);
+        dispatchUploadExcelHeader({ type:'CLEAR' });
     }
 
     const onChangeInputValue = (e) => {
@@ -258,7 +278,7 @@ const ExcelTranslatorBody = (props) => {
             if(r.id === headerId) {
                 return {
                     ...r,
-                    headerName: e.target.value
+                    [e.target.name]: e.target.value
                 }    
             }else{
                 return r;
@@ -304,8 +324,8 @@ const ExcelTranslatorBody = (props) => {
         return {
             addCell: function (e) {
                 e.preventDefault();
-
-                setUploadCustomizedHeaderList(uploadCustomizedHeaderList.concat(new UploadHeaderDetail().toJSON()));
+                
+                setUploadCustomizedHeaderList(uploadCustomizedHeaderList.concat(new DownloadHeaderDetail().toJSON()));
             },
             deleteCell: function (e, headerId) {
                 e.preventDefault();
@@ -318,7 +338,6 @@ const ExcelTranslatorBody = (props) => {
                 e.preventDefault();
 
                 let excelHeader = selectedUploadHeader;
-                
                 excelHeader.downloadHeaderTitle = uploadExcelHeader.storageTitle;
                 excelHeader.downloadHeaderDetail.details = uploadCustomizedHeaderList;
             
@@ -331,15 +350,36 @@ const ExcelTranslatorBody = (props) => {
 
                 setUploadCustomizedHeaderList(uploadCustomizedHeaderList.map(r => {
                     if(r.id === customizedDataId) {
-                        r.targetCellNumber = uploadHeaderDetailData.cellNumber;
+                        // 고정값 체크되지 않은 데이터들만 targetCellNumber을 변경
+                        if(!fixedValueCheckList.includes(customizedDataId)){
+                            r.targetCellNumber = uploadHeaderDetailData.cellNumber;
+                        }
                         r.refUploadHeaderName = uploadHeaderDetailData.headerName;
                         r.uploadHeaderId = uploadHeaderDetailData.id;
                         return r;
                     }else{
                         return r;
                     }
-                }));
-            }
+                }))
+            },
+            isChecked: function (headerId) {
+                return fixedValueCheckList.includes(headerId);
+            },
+            checkOne: function (e, headerId) {
+                if (e.target.checked) {
+                    setFixedValueCheckList(fixedValueCheckList.concat(headerId));
+                    setUploadCustomizedHeaderList(uploadCustomizedHeaderList.map(r => {
+                        if(r.id === headerId) {
+                            r.targetCellNumber = -1;
+                            return r;
+                        }else{
+                            return r;
+                        }
+                    }));
+                } else {
+                    setFixedValueCheckList(fixedValueCheckList.filter(r => r !== headerId));
+                }
+            },
         }
     }
 
@@ -355,12 +395,12 @@ const ExcelTranslatorBody = (props) => {
                                 <div style={{ width: '100%' }}>
                                     <Box sx={{ display: 'flex' }}>
                                         <FormControl fullWidth>
-                                            <InputLabel id="storage-select-id">Title</InputLabel>
+                                            <InputLabel id="upload-storage-select-id">Title</InputLabel>
                                             <Select
-                                                labelId="storage-select-id"
-                                                id="storage-select"
+                                                labelId="upload-storage-select-id"
+                                                id="upload-storage-select"
                                                 value={selectedUploadHeader?.uploadHeaderTitle || ''}
-                                                label="storage-selector"
+                                                label="upload-storage-selector"
                                             >
                                                 {props.excelTranslatorHeaderList?.map((data, idx) => {
                                                     return (
@@ -384,14 +424,15 @@ const ExcelTranslatorBody = (props) => {
                                 <div style={{ width: '100%' }}>
                                     <Box sx={{ display: 'flex' }}>
                                         <FormControl fullWidth>
-                                            <InputLabel id="storage-select-id">Title</InputLabel>
+                                            <InputLabel id="download-storage-select-id">Title</InputLabel>
                                             <Select
-                                                labelId="storage-select-id"
-                                                id="storage-select"
+                                                labelId="download-storage-select-id"
+                                                id="download-storage-select"
                                                 value={selectedUploadHeader?.downloadHeaderTitle || ''}
-                                                label="storage-selector"
+                                                label="download-storage-selector"
                                             >
-                                                <MenuItem value={selectedUploadHeader?.downloadHeaderTitle} onClick={(e) => uploadExcel().selectedUploadHeader(e)}>{selectedUploadHeader?.downloadHeaderTitle}</MenuItem>
+                                                <MenuItem value={selectedUploadHeader?.downloadHeaderTitle}
+                                                >{selectedUploadHeader?.downloadHeaderTitle}</MenuItem>
                                             </Select>
                                         </FormControl>
                                     </Box>
@@ -408,7 +449,7 @@ const ExcelTranslatorBody = (props) => {
                             <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
                             <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.__handleEventControl().uploadExcelData().submit(e, selectedUploadHeader)} />
                         </Form>
-                        <Form onSubmit={(e) => props.__handleEventControl().storeExcelData().submit(e)}>
+                        <Form onSubmit={(e) => props.__handleEventControl().downloadExcelFile().submit(e)}>
                             <ControlBtn type="submit">발주서 다운로드</ControlBtn>
                         </Form>
                     </TranslatorBtnBox>

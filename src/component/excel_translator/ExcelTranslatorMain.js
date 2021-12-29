@@ -114,11 +114,11 @@ const ExcelTranslatorMain = () => {
                     }
                 }
             },
-            storeExcelData: function () {
+            downloadExcelFile: function () {
                 return {
                     submit: async function (e) {
                         e.preventDefault();
-                        await __handleDataConnect().storeExcelData();
+                        await __handleDataConnect().downloadExcelFile();
                     }
                 }
             }

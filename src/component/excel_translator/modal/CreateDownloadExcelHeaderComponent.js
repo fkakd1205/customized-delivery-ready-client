@@ -9,6 +9,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { Checkbox } from '@mui/material';
 
 const Container = styled.div`
 
@@ -62,7 +63,6 @@ const DataWrapper = styled.div`
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 10px;
-    min-height: 300px;
     padding: 16px;
     height: auto;
     background-color: rgba(70, 130, 180, 0.09);
@@ -214,10 +214,10 @@ const CreateDownloadExcelHeaderComponent = (props) => {
                                 required
                             />
                         </HeaderInfo>
-                        <DataWrapper>
-                            {props.uploadCustomizedHeaderList?.map((data, idx) => {
-                                return (
-                                    <React.Fragment key={data.id}>
+                        {props.uploadCustomizedHeaderList?.map((data, idx) => {
+                            return (
+                                <React.Fragment key={data.id}>
+                                    <DataWrapper>
                                         <DataGroup>
                                             <UploadDataGroup>
                                                 <div>{idx + 1}</div>
@@ -234,7 +234,7 @@ const CreateDownloadExcelHeaderComponent = (props) => {
                                                                 >
                                                                     {props.selectedUploadHeader?.uploadHeaderDetail.details.map((data2, idx2) => {
                                                                         return (
-                                                                            <MenuItem key={'excel_translator_upload_title' + idx2} value={data2.headerName} 
+                                                                            <MenuItem key={'excel_translator_upload_title' + idx2} value={data2.headerName}
                                                                                 onClick={(e) => props.downloadExcel().selectedUploadHeaderName(e, data.id, data2)}
                                                                             >{data2.headerName}</MenuItem>
                                                                         )
@@ -246,26 +246,35 @@ const CreateDownloadExcelHeaderComponent = (props) => {
                                                 </FormInput>
                                             </UploadDataGroup>
                                             <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
-                                            <DownloadDataGroup>
-                                                <DataInputEl type="text" name='uploadHeaderName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeUploadInputValue(e, data.id)} required></DataInputEl>
-                                                <DeleteBtn><RemoveCircleOutlineIcon type="button" sx={{ fontSize: 30 }} onClick={(e) => props.downloadExcel().deleteCell(e, data.id)} /></DeleteBtn>
-                                            </DownloadDataGroup>
+                                            <div>
+                                                <DownloadDataGroup>
+                                                    <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeUploadInputValue(e, data.id)} required></DataInputEl>
+                                                    <DeleteBtn><RemoveCircleOutlineIcon type="button" sx={{ fontSize: 30 }} onClick={(e) => props.downloadExcel().deleteCell(e, data.id)} /></DeleteBtn>
+                                                </DownloadDataGroup>
+                                                <DownloadDataGroup>
+                                                    <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeUploadInputValue(e, data.id)} disabled={!props.downloadExcel().isChecked(data.id)}></DataInputEl>
+                                                    <Checkbox
+                                                        onClick={(e) => props.downloadExcel().checkOne(e, data.id)}
+                                                        checked={props.downloadExcel().isChecked(data.id)}
+                                                    />
+                                                </DownloadDataGroup>
+                                            </div>
                                         </DataGroup>
-                                    </React.Fragment>
-                                )
-                            })}
+                                    </DataWrapper>
+                                </React.Fragment>
+                            )
+                        })}
 
-                            <CustomDataGroup>
-                                <AddCircleOutlineIcon type="button" sx={{ fontSize: 30}}
-                                    onClick={(e) => props.downloadExcel().addCell(e)}
-                                />
-                            </CustomDataGroup>
-                        </DataWrapper>
+                        <CustomDataGroup>
+                            <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
+                                onClick={(e) => props.downloadExcel().addCell(e)}
+                            />
+                        </CustomDataGroup>
                     </BodyContainer>
                 </form>
             </Container>
         </>
-    ) 
+    )
 }
 
 export default CreateDownloadExcelHeaderComponent;
