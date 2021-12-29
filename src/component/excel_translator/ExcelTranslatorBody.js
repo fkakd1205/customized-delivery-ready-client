@@ -454,6 +454,11 @@ const ExcelTranslatorBody = (props) => {
                         </Form>
                     </TranslatorBtnBox>
                 </DataWrapper>
+
+                <Form>
+                    <ControlLabel htmlFor="upload-file">헤더지정x 엑셀 파일 업로드</ControlLabel>
+                    <Input id="upload-file" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.__handleEventControl().uploadExcelData2().submit(e)} />
+                </Form>
             </Container>
 
             {/* Upload Header Modal */}

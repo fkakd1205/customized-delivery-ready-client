@@ -9,6 +9,8 @@ const ExcelTranslatorMain = () => {
     const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState([]);
     const [translatedExcelData, setTranslatedExcelData] = useState(null);
 
+    const [uploadedExcelData, setUploadedExcelData] = useState(null);
+
     useEffect(() => {
         async function fetchInit() {
             await __handleDataConnect().searchExcelTranslatorHeader();
@@ -90,6 +92,27 @@ const ExcelTranslatorMain = () => {
                     .catch(err => {
                         console.log(err);
                     });
+            },
+            uploadExcelFile2: async function (e) {
+                // 파일을 선택하지 않은 경우
+                if(e.target.files.length === 0) return;
+
+                let addFiles = e.target.files;
+
+                var uploadedFormData = new FormData();
+                uploadedFormData.append('file', addFiles[0]);
+
+                await excelTranslatorDataConnect().postFileTest(uploadedFormData)
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            setUploadedExcelData(res.data.data)
+                            console.log(res.data.data);
+                        }
+                    })
+                    .catch(err => {
+                        let res = err.response;
+                        alert(res?.data?.memo);
+                    })
             }
         }
     }
@@ -119,6 +142,14 @@ const ExcelTranslatorMain = () => {
                     submit: async function (e) {
                         e.preventDefault();
                         await __handleDataConnect().downloadExcelFile();
+                    }
+                }
+            },
+            uploadExcelData2: function () {
+                return {
+                    submit: async function (e) {
+                        e.preventDefault();
+                        await __handleDataConnect().uploadExcelFile2(e);
                     }
                 }
             }

@@ -30,6 +30,14 @@ const excelTranslatorDataConnect = () => {
                 responseType: 'blob',
                 withCredentials:true
             })
+        },
+        postFileTest: async function (formData) {
+            return await axios.post(`/api/v1/excel-translator/upload/test`, formData, {
+                headers: {
+                    "content-types": "multipart/form-data"
+                },
+                withCredentials: true
+            })
         }
     }
 }
