@@ -10,6 +10,7 @@ import { unstable_createMuiStrictModeTheme } from '@material-ui/core/styles';
 // import ModifyCustomizedHeaderMain from './component/customized_delivery_ready/ModifyCustomizedHeaderMain';
 // import CustomizedExcelUploadMain from './component/ex_customized_excel/CustomizedExcelUploadMain';
 // import TestMain from './component/test/TestMain';
+import ExcelTranslatorMainEx from './component/ex_excel_translator/ExcelTranslatorMain';
 import ExcelTranslatorMain from './component/excel_translator/ExcelTranslatorMain';
 
 const theme = unstable_createMuiStrictModeTheme();
@@ -30,6 +31,9 @@ function App() {
           {/* TEST */}
           {/* <Route path="/test" exact component={TestMain}></Route> */}
           
+          {/* 엑셀 변환기 test */}
+          <Route path="/excel-translator/test" exact component={ExcelTranslatorMainEx}></Route>
+
           {/* 엑셀 변환기 */}
           <Route path="/excel-translator" exact component={ExcelTranslatorMain}></Route>
       </ThemeProvider>

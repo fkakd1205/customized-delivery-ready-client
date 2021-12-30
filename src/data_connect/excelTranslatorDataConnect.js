@@ -17,22 +17,14 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        postFile: async function (formData) {
-            return await axios.post(`/api/v1/excel-translator/upload`, formData, {
-                headers: {
-                    "content-types": "multipart/form-data"
-                },
-                withCredentials: true
-            })
-        },
         downloadTranslatedExcelFile: async function (data) {
             return await axios.post(`/api/v1/excel-translator/download`, data, {
                 responseType: 'blob',
                 withCredentials:true
             })
         },
-        postFileTest: async function (formData) {
-            return await axios.post(`/api/v1/excel-translator/upload/test`, formData, {
+        postFile: async function (formData) {
+            return await axios.post(`/api/v1/excel-translator/upload`, formData, {
                 headers: {
                     "content-types": "multipart/form-data"
                 },
