@@ -30,6 +30,11 @@ const excelTranslatorDataConnect = () => {
                 },
                 withCredentials: true
             })
+        },
+        createUploadHeaderDetail: async function (uploadHeaderDetail) {
+            return await axios.put(`/api/v1/excel-translator/upload-header/one`, uploadHeaderDetail, {
+                withCredentials: true
+            })
         }
     }
 }

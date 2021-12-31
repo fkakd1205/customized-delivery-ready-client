@@ -13,7 +13,8 @@ import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
 import CreateTranslatorHeaderTitleComponent from "./modal/CreateTranslatorHeaderTitleComponent";
 import UploadedExcelDataBoard from "./UploadedExcelDataBoard";
 import DownloadedExcelDataBoard from "./DownloadedExcelDataBoard";
-import CreateTranslatorHeaderDetailComponent from "./modal/CreateTranslatorHeaderDetailComponent";
+import CreateTranslatorUploadHeaderDetailComponent from "./modal/CreateTranslatorUploadHeaderDetailComponent";
+import CreateTranslatorDownloadHeaderDetailComponent from "./modal/CreateTranslatorDownloadHeaderDetailComponent";
 
 
 const Container = styled.div`
@@ -207,6 +208,26 @@ class UploadHeaderDetail {
     }
 }
 
+class DownloadHeaderDetail {
+    constructor() {
+        this.id = uuidv4();
+        this.headerName = '';
+        this.targetCellNumber = -1;
+        this.fixedValue = '';
+        this.uploadHeaderId = null;
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            headerName: this.headerName,
+            targetCellNumber: this.targetCellNumber,
+            fixedValue: this.fixedValue,
+            uploadHeaderId: this.uploadheaderId
+        }
+    }
+}
+
 const initialExcelTitle = null;
 
 const excelTitleInfoReducer = (state, action) => {
@@ -224,14 +245,17 @@ const excelTitleInfoReducer = (state, action) => {
     }
 }
 
-const ExcelTranslatorBody = (props) => {
+const ExcelTranslatorControlBar = (props) => {
     const [excelTitleInfo, dispatchExcelTitleInfo] = useReducer(excelTitleInfoReducer, initialExcelTitle);
     const [selectedHeaderTitle, setSelectedHeaderTitle] = useState(null);
     const [excelTranslatorTitle, setExcelTranslatorTitle] = useState(new ExcelTranslatorHeader().toJSON());
     const [uploadHeaderDetail, setUploadHeaderDetail] = useState(new UploadHeaderDetail().toJSON());
+    const [downloadHeaderDetailList, setDownloadHeaderDetailList] = useState([]);
+    const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
 
     const [createTranslatorHeaderTitleModalOpen, setCreateTranslatorHeaderTitleModalOpen] = useState(false);
-    const [createTranslatorHeaderDetailModalOpen, setCreateTranslatorHeaderDetailModalOpen] = useState(false);
+    const [createTranslatorUploadHeaderDetailModalOpen, setCreateTranslatorUploadHeaderDetailModalOpen] = useState(false);
+    const [createTranslatorDownloadHeaderDetailModalOpen, setCreateTranslatorDownloadHeaderDetailModalOpen] = useState(false);
 
     const onCreateTranslatorHeaderTitleModalOpen = () => {
         setCreateTranslatorHeaderTitleModalOpen(true);
@@ -251,11 +275,28 @@ const ExcelTranslatorBody = (props) => {
         })
     }
 
+    const onChangeDownloadInputValue = (e, headerId) => {
+        onChangeInputValue(e);
+
+        setDownloadHeaderDetailList(downloadHeaderDetailList.map(r => {
+            if(r.id === headerId) {
+                return {
+                    ...r,
+                    [e.target.name]: e.target.value
+                }    
+            }else{
+                return r;
+            }
+        }));
+    }
+
     const excelTranslatorHeader = () => {
         return {
             selectedUploadHeaderName: function (e, data) {
                 e.preventDefault();
 
+                // uploadedExcelData를 null로 변경
+                props.resetUploadExcelFile();
                 setSelectedHeaderTitle(props.excelTranslatorHeaderList.filter(r => r.id === data.id)[0]);
             },
             submit: async function (e) {
@@ -270,23 +311,23 @@ const ExcelTranslatorBody = (props) => {
                 await props.createTranslatorHeaderTitle(excelHeader);
                 onCreateUploadExcelHeaderModalClose();
             },
-            storeExcelForm: async function (e) {
+            storeUploadedExcelHeaderDetail: async function (e) {
                 e.preventDefault();
 
                 // 업로드된 header 데이터
                 let uploadedHeader = props.uploadedExcelData[0].uploadedData;
 
-                let data = uploadedHeader.details.map((r, idx) => {
-                    let data2 = new UploadHeaderDetail().toJSON();
-                    data2.cellNumber = idx;
-                    data2.headerName = r.colData;
-                    data2.cellType = r.cellType;
+                let uploadDetails = uploadedHeader.details.map((r, idx) => {
+                    let data = new UploadHeaderDetail().toJSON();
+                    data.cellNumber = idx;
+                    data.headerName = r.colData;
+                    data.cellType = r.cellType;
 
-                    return data2;
+                    return data;
                 })
 
-                let excelHeader = excelTranslatorTitle;
-                excelHeader.uploadHeaderDetail.details = data;
+                let excelHeader = selectedHeaderTitle;
+                excelHeader.uploadHeaderDetail.details = uploadDetails;
 
                 await props.createUploadHeaderDetails(excelHeader)
 
@@ -314,6 +355,10 @@ const ExcelTranslatorBody = (props) => {
         
                         var uploadedFormData = new FormData();
                         uploadedFormData.append('file', addFiles[0]);
+                        uploadedFormData.append(
+                            "dto",
+                            new Blob([JSON.stringify(selectedHeaderTitle)], { type: "application/json" })
+                        );
         
                         await props.uploadExcelFile(uploadedFormData);
                     }
@@ -332,10 +377,72 @@ const ExcelTranslatorBody = (props) => {
                             return;
                         }
                         
-                        setCreateTranslatorHeaderDetailModalOpen(true);
+                        setCreateTranslatorUploadHeaderDetailModalOpen(true);
                     },
                     close: function () {
-                        setCreateTranslatorHeaderDetailModalOpen(false);
+                        setCreateTranslatorUploadHeaderDetailModalOpen(false);
+                    }
+                }
+            },
+            downloadedExcelForm: function () {
+                return {
+                    open: function (e) {
+                        e.preventDefault();
+
+                        if(!selectedHeaderTitle) {
+                            alert('헤더 형식을 먼저 선택해주세요.');
+                            return;
+                        }
+                        
+                        if(selectedHeaderTitle.downloadHeaderDetail.details.length > 0) {
+                            setDownloadHeaderDetailList(selectedHeaderTitle.downloadHeaderDetail.details);
+                        }else {
+                            setDownloadHeaderDetailList([new DownloadHeaderDetail().toJSON()]);
+                        }
+                        setCreateTranslatorDownloadHeaderDetailModalOpen(true);
+                    },
+                    close: function () {
+                        setCreateTranslatorDownloadHeaderDetailModalOpen(false);
+                    },
+                    addCell: function (e) {
+                        e.preventDefault();
+
+                        setDownloadHeaderDetailList(downloadHeaderDetailList.concat(new DownloadHeaderDetail().toJSON()));
+                    },
+                    selectedUploadHeaderName: function (e, customizedDataId, downloadHeaderDetailData) {
+                        e.preventDefault();
+        
+                        setDownloadHeaderDetailList(downloadHeaderDetailList.map(r => {
+                            if(r.id === customizedDataId) {
+                                // 고정값 체크되지 않은 데이터들만 targetCellNumber을 변경
+                                if(!fixedValueCheckList.includes(customizedDataId)){
+                                    r.targetCellNumber = downloadHeaderDetailData.cellNumber;
+                                }
+                                r.refUploadHeaderName = downloadHeaderDetailData.headerName;
+                                r.uploadHeaderId = downloadHeaderDetailData.id;
+                                return r;
+                            }else{
+                                return r;
+                            }
+                        }))
+                    },
+                    isChecked: function (headerId) {
+                        return fixedValueCheckList.includes(headerId);
+                    },
+                    checkOne: function (e, headerId) {
+                        if (e.target.checked) {
+                            setFixedValueCheckList(fixedValueCheckList.concat(headerId));
+                            setDownloadHeaderDetailList(downloadHeaderDetailList.map(r => {
+                                if(r.id === headerId) {
+                                    r.targetCellNumber = -1;
+                                    return r;
+                                }else{
+                                    return r;
+                                }
+                            }));
+                        } else {
+                            setFixedValueCheckList(fixedValueCheckList.filter(r => r !== headerId));
+                        }
                     }
                 }
             }
@@ -390,13 +497,17 @@ const ExcelTranslatorBody = (props) => {
                 </DataContainer>
             </Container>
 
+            {/* 엑셀 업로드 헤더 및 데이터 보드 */}
             <UploadedExcelDataBoard
+                selectedHeaderTitle={selectedHeaderTitle}
                 uploadedExcelData={props.uploadedExcelData}
                 excelFormControl={(e) => excelFile().uploadedExcelForm(e)}
             ></UploadedExcelDataBoard>
 
+            {/* 엑셀 다운로드 헤더 보드 */}
             <DownloadedExcelDataBoard
                 selectedHeaderTitle={selectedHeaderTitle}
+                excelFormControl={(e) => excelFile().downloadedExcelForm(e)}
             ></DownloadedExcelDataBoard>
 
             {/* Create Header Title Modal */}
@@ -413,22 +524,41 @@ const ExcelTranslatorBody = (props) => {
                 ></CreateTranslatorHeaderTitleComponent>
             </ExcelTranslatorCommonModal>
 
-            {/* Create Header Form Check Modal */}
+            {/* Create Upload Header Form Check Modal */}
             <ExcelTranslatorCommonModal
-                open={createTranslatorHeaderDetailModalOpen}
+                open={createTranslatorUploadHeaderDetailModalOpen}
                 onClose={() => excelFile().uploadedExcelForm().close()}
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <CreateTranslatorHeaderDetailComponent
+                <CreateTranslatorUploadHeaderDetailComponent
                     excelTitleInfo={excelTitleInfo}
                     excelTranslatorHeaderControl={excelTranslatorHeader}
                     excelFormControl={excelFile().uploadedExcelForm}
                     uploadedExcelDataHeader={props.uploadedExcelData}
-                ></CreateTranslatorHeaderDetailComponent>
+                ></CreateTranslatorUploadHeaderDetailComponent>
             </ExcelTranslatorCommonModal>
+
+            {/* Create Download Header Modal */}
+            <ExcelTranslatorCommonModal
+                open={createTranslatorDownloadHeaderDetailModalOpen}
+                onClose={() => excelFile().downloadedExcelForm().close()}
+                maxWidth={'md'}
+                fullWidth={true}
+            >
+                <CreateTranslatorDownloadHeaderDetailComponent
+                    excelTitleInfo={excelTitleInfo}
+                    excelTranslatorHeaderControl={excelTranslatorHeader}
+                    excelFormControl={excelFile().downloadedExcelForm}
+                    selectedHeaderTitle={selectedHeaderTitle}
+                    downloadHeaderDetailList={downloadHeaderDetailList}
+                    onChangeInputValue={onChangeInputValue}
+                    onChangeDownloadInputValue={onChangeDownloadInputValue}
+                ></CreateTranslatorDownloadHeaderDetailComponent>
+            </ExcelTranslatorCommonModal>
+            
         </>
     )
 }
 
-export default ExcelTranslatorBody;
+export default ExcelTranslatorControlBar;

@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import { withRouter } from 'react-router';
 
-import ExcelTranslatorBody from "./ExcelTranslatorBody";
+import ExcelTranslatorControlBar from "./ExcelTranslatorControlBar";
 import { excelTranslatorDataConnect } from '../../data_connect/excelTranslatorDataConnect';
 
 const ExcelTranslatorMain = () => {
@@ -50,12 +50,22 @@ const ExcelTranslatorMain = () => {
                     })
                     .catch(err => {
                         let res = err.response;
-                        alert(res?.data?.memo);
+                        alert(res?.data?.message);
                     })
             },
-            // createUploadHeaderDetails: async function (uploadHeaderDetails) {
-            //     await excelTranslatorDataConnect().createUploadHeaderDetail()
-            // }
+            createUploadHeaderDetails: async function (uploadHeaderDetails) {
+                await excelTranslatorDataConnect().createUploadHeaderDetail(uploadHeaderDetails)
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            alert('저장되었습니다.');
+                            this.searchExcelTranslatorHeader();
+                        }
+                    })
+                    .catch(err => {
+                        let res = err.response;
+                        alert(res?.data?.memo);
+                    })
+            }
         }
     }
 
@@ -72,6 +82,9 @@ const ExcelTranslatorMain = () => {
                 return {
                     submit: async function (uploadedFormData) {
                         await __handleDataConnect().uploadExcelFile(uploadedFormData);
+                    },
+                    reset: function () {
+                        setUploadedExcelData(null);
                     }
                 }
             },
@@ -88,14 +101,16 @@ const ExcelTranslatorMain = () => {
 
     return (
         <>
-            <ExcelTranslatorBody
+            <ExcelTranslatorControlBar
                 excelTranslatorHeaderList={excelTranslatorHeaderList}
-                createTranslatorHeaderTitle={(excelTranslatorTitle) => __handleEventControl().translatorHeader().submit(excelTranslatorTitle)}
-                uploadExcelFile={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
-                createUploadHeaderDetails={(uploadHeaderDetails) => __handleEventControl().createUploadHeaderDetails().submit(uploadHeaderDetails)}
                 uploadedExcelData={uploadedExcelData}
 
-            ></ExcelTranslatorBody>
+                createTranslatorHeaderTitle={(excelTranslatorTitle) => __handleEventControl().translatorHeader().submit(excelTranslatorTitle)}
+                uploadExcelFile={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
+                resetUploadExcelFile={() => __handleEventControl().uploadExcelData().reset()}
+                createUploadHeaderDetails={(uploadHeaderDetails) => __handleEventControl().createUploadHeaderDetails().submit(uploadHeaderDetails)}
+
+            ></ExcelTranslatorControlBar>
         </>
     )
 }

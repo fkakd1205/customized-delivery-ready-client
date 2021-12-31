@@ -13,7 +13,7 @@ const BoardTitle = styled.div`
     font-size: large;
     color: rgba(000, 102, 153, 0.9);
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 90% 10%;
     align-items: center;
     padding: 10px;
 
@@ -28,7 +28,7 @@ const BoardTitle = styled.div`
 
 const DataOptionBox = styled.span`
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     column-gap: 10px;
 `;
 
@@ -87,9 +87,21 @@ const StoreBtn = styled.button`
 
 const UploadedExcelDataBoard = (props) => {
     // 헤더 데이터
-    const uploadedExcelHeaderData = props.uploadedExcelData != null ? props.uploadedExcelData[0] : null;
+    let uploadedExcelHeaderData = props.uploadedExcelData !== null ? props.uploadedExcelData[0].uploadedData.details : null;
+
+    // 선택된 헤더의 업로드 headerDetails가 설정되어있다면 colData 지정.
+    if(props.selectedHeaderTitle?.uploadHeaderDetail.details.length) {
+        uploadedExcelHeaderData = props.selectedHeaderTitle.uploadHeaderDetail.details;
+        uploadedExcelHeaderData = uploadedExcelHeaderData.map(r => {
+            return {
+                ...r,
+                colData: r.headerName
+            }
+        });
+    }
+
     // 헤더 데이터를 제외한 데이터
-    const uploadedExcelData = props.uploadedExcelData?.filter(r => r.id !== uploadedExcelHeaderData.id);
+    let uploadedExcelData = props.uploadedExcelData?.filter((r, idx) => idx !== 0);
 
     return (
         <>
@@ -98,14 +110,13 @@ const UploadedExcelDataBoard = (props) => {
                     <span>업로드 엑셀 헤더 및 데이터</span>
                     <DataOptionBox>
                         <StoreBtn type="button" onClick={(e) => props.excelFormControl().open(e)}>양식 저장</StoreBtn>
-                        <StoreBtn type="button" onClick={(e) => props.__handleEventControl().deliveryReadyReleaseMemo().open(e)}>양식 수정</StoreBtn>
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
                     <table className="table table-sm" style={{ tableLayout: 'fixed' }}>
                         <thead>
                             <tr>
-                                {uploadedExcelHeaderData?.uploadedData.details.map((data, idx) => {
+                                {uploadedExcelHeaderData?.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'upload_header_idx' + idx} className="fixed-header xlarge-cell" scope="col">
                                             <span>{data.colData}</span>

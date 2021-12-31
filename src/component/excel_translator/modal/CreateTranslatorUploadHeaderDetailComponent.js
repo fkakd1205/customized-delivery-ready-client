@@ -66,11 +66,11 @@ const HeaderInfo = styled.div`
     align-items: center;
 `;
 
-const CreateTranslatorHeaderDetailComponent = (props) => {
+const CreateTranslatorUploadHeaderDetailComponent = (props) => {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.excelTranslatorHeaderControl().storeExcelForm(e)}>
+                <form onSubmit={(e) => props.excelTranslatorHeaderControl().storeUploadedExcelHeaderDetail(e)}>
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>
@@ -95,4 +95,4 @@ const CreateTranslatorHeaderDetailComponent = (props) => {
     )
 }
 
-export default CreateTranslatorHeaderDetailComponent;
+export default CreateTranslatorUploadHeaderDetailComponent;
