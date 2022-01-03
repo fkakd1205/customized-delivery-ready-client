@@ -16,7 +16,6 @@ import DownloadedExcelDataBoard from "./DownloadedExcelDataBoard";
 import CreateTranslatorUploadHeaderDetailComponent from "./modal/CreateTranslatorUploadHeaderDetailComponent";
 import CreateTranslatorDownloadHeaderDetailComponent from "./modal/CreateTranslatorDownloadHeaderDetailComponent";
 
-
 const Container = styled.div`
 `;
 
@@ -364,6 +363,15 @@ const ExcelTranslatorControlBar = (props) => {
                     }
                 }
             },
+            downloadExcel: function () {
+                return {
+                    downloadTranslatedExcelFile: async function (e) {
+                        e.preventDefault();
+
+                        await props.downloadTranslatedExcelFile(selectedHeaderTitle.downloadHeaderDetail.details);
+                    }
+                }
+            },
             uploadedExcelForm: function () {
                 return {
                     open: function (e) {
@@ -384,7 +392,7 @@ const ExcelTranslatorControlBar = (props) => {
                     }
                 }
             },
-            downloadedExcelForm: function () {
+            downloadExcelForm: function () {
                 return {
                     open: function (e) {
                         e.preventDefault();
@@ -394,9 +402,10 @@ const ExcelTranslatorControlBar = (props) => {
                             return;
                         }
                         
+                        // 양식이 이미 설정되어 있다면
                         if(selectedHeaderTitle.downloadHeaderDetail.details.length > 0) {
                             setDownloadHeaderDetailList(selectedHeaderTitle.downloadHeaderDetail.details);
-                        }else {
+                        }else {     // 새로운 양식을 생성하는 경우
                             setDownloadHeaderDetailList([new DownloadHeaderDetail().toJSON()]);
                         }
                         setCreateTranslatorDownloadHeaderDetailModalOpen(true);
@@ -408,6 +417,24 @@ const ExcelTranslatorControlBar = (props) => {
                         e.preventDefault();
 
                         setDownloadHeaderDetailList(downloadHeaderDetailList.concat(new DownloadHeaderDetail().toJSON()));
+                    },
+                    deleteCell: function (e, headerId) {
+                        e.preventDefault();
+        
+                        if(downloadHeaderDetailList.length > 1){
+                            setDownloadHeaderDetailList(downloadHeaderDetailList.filter(r => r.id !== headerId));
+                        }
+                    },
+                    createDownloadExcelHeaderDetail: async function (e) {
+                        e.preventDefault();
+        
+                        let excelHeader = selectedHeaderTitle;
+                        excelHeader.downloadHeaderDetail.details = downloadHeaderDetailList;
+        
+                        await props.createDownloadHeaderDetails(excelHeader)
+        
+                        setCreateTranslatorDownloadHeaderDetailModalOpen(false);
+        
                     },
                     selectedUploadHeaderName: function (e, customizedDataId, downloadHeaderDetailData) {
                         e.preventDefault();
@@ -490,7 +517,7 @@ const ExcelTranslatorControlBar = (props) => {
                             <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
                             <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => excelFile().uploadExcel().uploadExcelFile(e)} />
                         </Form>
-                        <Form onSubmit={(e) => props.__handleEventControl().downloadExcelFile().submit(e)}>
+                        <Form onSubmit={(e) => excelFile().downloadExcel().downloadTranslatedExcelFile(e)}>
                             <ControlBtn type="submit">발주서 다운로드</ControlBtn>
                         </Form>
                     </TranslatorBtnBox>
@@ -507,7 +534,7 @@ const ExcelTranslatorControlBar = (props) => {
             {/* 엑셀 다운로드 헤더 보드 */}
             <DownloadedExcelDataBoard
                 selectedHeaderTitle={selectedHeaderTitle}
-                excelFormControl={(e) => excelFile().downloadedExcelForm(e)}
+                excelFormControl={(e) => excelFile().downloadExcelForm(e)}
             ></DownloadedExcelDataBoard>
 
             {/* Create Header Title Modal */}
@@ -542,16 +569,16 @@ const ExcelTranslatorControlBar = (props) => {
             {/* Create Download Header Modal */}
             <ExcelTranslatorCommonModal
                 open={createTranslatorDownloadHeaderDetailModalOpen}
-                onClose={() => excelFile().downloadedExcelForm().close()}
+                onClose={() => excelFile().downloadExcelForm().close()}
                 maxWidth={'md'}
                 fullWidth={true}
             >
                 <CreateTranslatorDownloadHeaderDetailComponent
                     excelTitleInfo={excelTitleInfo}
-                    excelTranslatorHeaderControl={excelTranslatorHeader}
-                    excelFormControl={excelFile().downloadedExcelForm}
                     selectedHeaderTitle={selectedHeaderTitle}
                     downloadHeaderDetailList={downloadHeaderDetailList}
+                    excelTranslatorHeaderControl={excelTranslatorHeader}
+                    excelFormControl={excelFile().downloadExcelForm}
                     onChangeInputValue={onChangeInputValue}
                     onChangeDownloadInputValue={onChangeDownloadInputValue}
                 ></CreateTranslatorDownloadHeaderDetailComponent>

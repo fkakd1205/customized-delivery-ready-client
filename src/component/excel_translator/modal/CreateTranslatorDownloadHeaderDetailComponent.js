@@ -194,7 +194,7 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.downloadExcel().submit(e)}>
+                <form onSubmit={(e) => props.excelFormControl().createDownloadExcelHeaderDetail(e)}>
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>
@@ -224,7 +224,7 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
                                                                 >
                                                                     {props.selectedHeaderTitle?.uploadHeaderDetail.details.map((data2, idx2) => {
                                                                         return (
-                                                                            <MenuItem key={'excel_translator_upload_title' + idx2} value={data2.headerName}
+                                                                            <MenuItem key={'excel_translator_download_title' + idx2} value={data2.headerName}
                                                                                 onClick={(e) => props.excelFormControl().selectedUploadHeaderName(e, data.id, data2)}
                                                                             >{data2.headerName}</MenuItem>
                                                                         )
@@ -238,11 +238,11 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
                                             <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
                                             <div>
                                                 <DownloadDataGroup>
-                                                    <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeDownloadInputValue(e, data.id)} required></DataInputEl>
-                                                    <DeleteBtn><RemoveCircleOutlineIcon type="button" sx={{ fontSize: 30 }} onClick={(e) => props.excelFormControl().deleteCell(e, data.id)} /></DeleteBtn>
+                                                    <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeDownloadInputValue(e, data.id)} value={data.headerName} required></DataInputEl>
+                                                    <DeleteBtn><RemoveCircleOutlineIcon type="button" sx={{ fontSize: 30 }} onClick={(e) => props.excelFormControl().deleteCell(e, data.id)}/></DeleteBtn>
                                                 </DownloadDataGroup>
                                                 <DownloadDataGroup>
-                                                    <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeDownloadInputValue(e, data.id)} disabled={!props.excelFormControl().isChecked(data.id)}></DataInputEl>
+                                                    <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeDownloadInputValue(e, data.id)} disabled={!props.excelFormControl().isChecked(data.id)} value={data.fixedValue}></DataInputEl>
                                                     <Checkbox
                                                         onClick={(e) => props.excelFormControl().checkOne(e, data.id)}
                                                         checked={props.excelFormControl().isChecked(data.id)}
@@ -257,7 +257,7 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
 
                         <CustomDataGroup>
                             <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
-                                onClick={(e) => props.downloadExcel().addCell(e)}
+                                onClick={(e) => props.excelFormControl().addCell(e)}
                             />
                         </CustomDataGroup>
                     </BodyContainer>

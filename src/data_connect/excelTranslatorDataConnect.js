@@ -12,17 +12,11 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        updateOne: async function (data) {
-            return await axios.put(`/api/v1/excel-translator/one`, data, {
-                withCredentials: true
-            })
-        },
-        downloadTranslatedExcelFile: async function (data) {
-            return await axios.post(`/api/v1/excel-translator/download`, data, {
-                responseType: 'blob',
-                withCredentials:true
-            })
-        },
+        // updateOne: async function (data) {
+        //     return await axios.put(`/api/v1/excel-translator/one`, data, {
+        //         withCredentials: true
+        //     })
+        // },
         postFile: async function (formData) {
             return await axios.post(`/api/v1/excel-translator/upload`, formData, {
                 headers: {
@@ -32,10 +26,21 @@ const excelTranslatorDataConnect = () => {
             })
         },
         createUploadHeaderDetail: async function (uploadHeaderDetail) {
-            return await axios.put(`/api/v1/excel-translator/upload-header/one`, uploadHeaderDetail, {
+            return await axios.put(`/api/v1/excel-translator/header/upload/one`, uploadHeaderDetail, {
                 withCredentials: true
             })
-        }
+        },
+        createDownloadHeaderDetails: async function (downloadHeaderDetail) {
+            return await axios.put(`/api/v1/excel-translator/header/download/one`, downloadHeaderDetail, {
+                withCredentials: true
+            })
+        },
+        downloadTranslatedExcelFile: async function (uploadedExcelData) {
+            return await axios.post(`/api/v1/excel-translator/download`, uploadedExcelData, {
+                responseType: 'blob',
+                withCredentials:true
+            })
+        },
     }
 }
 

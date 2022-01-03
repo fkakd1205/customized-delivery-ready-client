@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { withRouter } from 'react-router';
 import { propTypes } from "react-bootstrap/esm/Image";
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
+import moment from "moment";
 
 const Container = styled.div`
     padding: 0 2%;
@@ -134,9 +135,8 @@ const UploadedExcelDataBoard = (props) => {
                                         {data.uploadedData.details.map((detailData, detailIdx) => {
                                             return (
                                             <BodyTd key={'upload_excel_data_detail_idx' + detailIdx} className="col">
-                                                <span>{detailData.colData}</span>
+                                                <span>{detailData.cellType === 'Date' ? moment(detailData.colData).format("YY/MM/DD HH:mm:ss") : detailData.colData}</span>
                                             </BodyTd>
-    
                                             )
                                         })}
                                     </BodyTr>

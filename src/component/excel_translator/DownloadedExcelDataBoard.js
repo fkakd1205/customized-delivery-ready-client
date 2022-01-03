@@ -32,8 +32,8 @@ const DataOptionBox = styled.span`
 `;
 
 const BoardContainer = styled.div`
-    /* background-color: white; */
-    /* overflow: auto; */
+    background-color: white;
+    overflow: scroll;
     border-radius: 5px;
     padding-bottom: 50px;
 
@@ -90,7 +90,7 @@ const DownloadedExcelDataBoard = (props) => {
                 <BoardTitle>
                     <span>다운로드 엑셀 헤더</span>
                     <DataOptionBox>
-                        <StoreBtn type="button" onClick={(e) => props.excelFormControl().open(e)}>양식 생성</StoreBtn>
+                        <StoreBtn type="button" onClick={(e) => props.excelFormControl().open(e)}>양식 설정</StoreBtn>
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
@@ -100,7 +100,7 @@ const DownloadedExcelDataBoard = (props) => {
                                 {props.selectedHeaderTitle?.downloadHeaderDetail.details.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'download_header_idx' + idx} className="fixed-header medium-cell" scope="col">
-                                            <span>{data.headerName}</span>
+                                            <span>{idx+1}. </span><span>{data.headerName}</span>
                                         </HeaderTh>
                                     )
                                 })}
