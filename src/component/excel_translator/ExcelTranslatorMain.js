@@ -152,12 +152,14 @@ const ExcelTranslatorMain = () => {
                         let excelData = downloadHeaderDetail.map(r => {
                             return uploadedExcelData.map((data, idx) => {
                                 if(idx === 0) {
+                                    // 다운로드 헤더 이름 설정
                                     let details = {
                                         colData: r.headerName,
                                         cellType: 'String'
                                     }
                                     return details;
                                 }else{
+                                    // 고정값 컬럼이라면
                                     if(r.targetCellNumber === -1) {
                                         let details = {
                                             colData: r.fixedValue,

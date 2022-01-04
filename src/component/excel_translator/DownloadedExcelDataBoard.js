@@ -4,8 +4,9 @@ import { withRouter } from 'react-router';
 import { propTypes } from "react-bootstrap/esm/Image";
 
 const Container = styled.div`
-    padding: 0 2%;
+    padding: 2%;
     background-color: #f2f5ff;
+    padding-bottom: 100px;
 `;
 
 const BoardTitle = styled.div`
@@ -58,17 +59,6 @@ const HeaderTh = styled.th`
     vertical-align: middle !important;
     text-align: center;
     width: 150px;
-`;
-
-const BodyTr = styled.tr`
-    border-bottom: 1px solid #a7a7a740;
-`;
-
-const BodyTd = styled.td`
-    vertical-align: middle !important;
-    text-align: center;
-    width: 150px;
-    border-right: 1px solid #a7a7a720;
 `;
 
 const StoreBtn = styled.button`

@@ -11,7 +11,6 @@ const ItemContainer = styled.div`
 
 const ItemWrapper = styled.div`
     background:white;
-    /* border: 1px solid #5961c788; */
     border-radius: 5px;
 `;
 
@@ -21,11 +20,6 @@ const ItemHeaderWrapper = styled.div`
     overflow: auto;
     display: grid;
     grid-template-columns: 6fr 1fr;
-    
-    & .ref-stock-btn-active {
-        background-color: #4682B4;
-        color: white;
-    }
 `;
 
 const GroupTitle = styled.div`
@@ -48,6 +42,7 @@ const DataTitle = styled.div`
 
 const BodyContainer = styled.div`
     padding: 10px;
+    background-color: rgb(232 236 247);
 `;
 
 const CommonInputEl = styled.input`

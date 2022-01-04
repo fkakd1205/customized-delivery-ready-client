@@ -39,17 +39,18 @@ const DataTitle = styled.div`
 
 const TitleSelector = styled.div`
     display: grid;
-    grid-template-columns: 15% 20% 5%;
+    /* grid-template-columns: 15% 20% 5%; */
+    grid-template-columns: 90% 10%;
     grid-template-rows: 1fr;
     padding: 20px 0px;
     text-align: center;
     align-items: center;
 `;
 
-
 const FormInput = styled.div`
     color: black;
     display: flex;
+    /* background-color: white; */
     vertical-align: middle;
 `;
 
@@ -82,7 +83,7 @@ const DataContainer = styled.div`
 
 const TranslatorBtnBox = styled.div`
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     text-align: center;
     align-items: center;
     background-color: #f2f5ff;
@@ -91,6 +92,7 @@ const TranslatorBtnBox = styled.div`
 
 const Form = styled.form`
     margin: 10px;
+    float: right;
 
     @media only screen and (max-width:576px){
         width: 100%;
@@ -258,10 +260,27 @@ const ExcelTranslatorControlBar = (props) => {
 
     const onCreateTranslatorHeaderTitleModalOpen = () => {
         setCreateTranslatorHeaderTitleModalOpen(true);
+        setExcelTranslatorTitle(new ExcelTranslatorHeader().toJSON());
     }
 
     const onCreateUploadExcelHeaderModalClose = () => {
         setCreateTranslatorHeaderTitleModalOpen(false);
+    }
+
+    const onCreateTranslatorUploadHeaderDetailModalOpen = () => {
+        setCreateTranslatorUploadHeaderDetailModalOpen(true);
+    }
+
+    const onCreateTranslatorUploadHeaderDetailModalClose = () => {
+        setCreateTranslatorUploadHeaderDetailModalOpen(false);
+    }
+
+    const onCreateTranslatorDownloadHeaderDetailModalOpen = () => {
+        setCreateTranslatorDownloadHeaderDetailModalOpen(true);
+    }
+
+    const onCreateTranslatorDownloadHeaderDetailModalClose = () => {
+        setCreateTranslatorDownloadHeaderDetailModalOpen(false);
     }
 
     const onChangeInputValue = (e) => {
@@ -301,7 +320,7 @@ const ExcelTranslatorControlBar = (props) => {
             submit: async function (e) {
                 e.preventDefault();
 
-                // 엑셀 타이틀 정보 설정
+                // 엑셀 타이틀 정보 설정 (업로드 타이틀, 다운로드 타이틀, 데이터 시작 행)
                 let excelHeader = excelTranslatorTitle;
                 excelHeader.uploadHeaderTitle = excelTitleInfo.uploadHeaderTitle;
                 excelHeader.downloadHeaderTitle = excelTitleInfo.downloadHeaderTitle;
@@ -329,7 +348,7 @@ const ExcelTranslatorControlBar = (props) => {
                 excelHeader.uploadHeaderDetail.details = uploadDetails;
 
                 await props.createUploadHeaderDetails(excelHeader)
-
+                onCreateUploadExcelHeaderModalClose();
             }
         }
     }
@@ -385,10 +404,10 @@ const ExcelTranslatorControlBar = (props) => {
                             return;
                         }
                         
-                        setCreateTranslatorUploadHeaderDetailModalOpen(true);
+                        onCreateTranslatorUploadHeaderDetailModalOpen();
                     },
                     close: function () {
-                        setCreateTranslatorUploadHeaderDetailModalOpen(false);
+                        onCreateTranslatorUploadHeaderDetailModalClose()
                     }
                 }
             },
@@ -408,10 +427,10 @@ const ExcelTranslatorControlBar = (props) => {
                         }else {     // 새로운 양식을 생성하는 경우
                             setDownloadHeaderDetailList([new DownloadHeaderDetail().toJSON()]);
                         }
-                        setCreateTranslatorDownloadHeaderDetailModalOpen(true);
+                        onCreateTranslatorDownloadHeaderDetailModalOpen();
                     },
                     close: function () {
-                        setCreateTranslatorDownloadHeaderDetailModalOpen(false);
+                        onCreateTranslatorDownloadHeaderDetailModalClose();
                     },
                     addCell: function (e) {
                         e.preventDefault();
@@ -433,8 +452,7 @@ const ExcelTranslatorControlBar = (props) => {
         
                         await props.createDownloadHeaderDetails(excelHeader)
         
-                        setCreateTranslatorDownloadHeaderDetailModalOpen(false);
-        
+                        onCreateTranslatorDownloadHeaderDetailModalClose();
                     },
                     selectedUploadHeaderName: function (e, customizedDataId, downloadHeaderDetailData) {
                         e.preventDefault();
@@ -479,39 +497,7 @@ const ExcelTranslatorControlBar = (props) => {
     return (
         <>
             <Container>
-                <TilteBar>
-                    <GroupTitle>엑셀 변환기</GroupTitle>
-                </TilteBar>
                 <DataContainer>
-                    <TitleSelector>
-                        <DataTitle>엑셀 형식 선택</DataTitle>
-                        <FormInput>
-                            <div style={{ width: '100%' }}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="storage-title-select-id">엑셀 형식 선택</InputLabel>
-                                        <Select
-                                            labelId="storage-title-select-id"
-                                            id="storage-title-select"
-                                            value={selectedHeaderTitle?.uploadHeaderTitle + ' > ' + selectedHeaderTitle?.downloadHeaderTitle || ''}
-                                            label="storage-title-selector"
-                                            defaultValue=''
-                                        >
-                                            {props.excelTranslatorHeaderList?.map((data, idx) => {
-                                                return (
-                                                    <MenuItem key={'excel_translator_title' + idx} value={data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle} onClick={(e) => excelTranslatorHeader().selectedUploadHeaderName(e, data)}>{data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}</MenuItem>
-                                                )
-                                            })}
-                                        </Select>
-                                    </FormControl>
-                                </Box>
-                            </div>
-                        </FormInput>
-                        <div>
-                            <StorageControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></StorageControlBtn>
-                        </div>
-                    </TitleSelector>
-
                     <TranslatorBtnBox>
                         <Form>
                             <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
@@ -520,6 +506,33 @@ const ExcelTranslatorControlBar = (props) => {
                         <Form onSubmit={(e) => excelFile().downloadExcel().downloadTranslatedExcelFile(e)}>
                             <ControlBtn type="submit">발주서 다운로드</ControlBtn>
                         </Form>
+                        <TitleSelector>
+                            <FormInput>
+                                <div style={{ width: '100%' }}>
+                                    <Box sx={{ display: 'flex' }}>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="storage-title-select-id">엑셀 형식 선택</InputLabel>
+                                            <Select
+                                                labelId="storage-title-select-id"
+                                                id="storage-title-select"
+                                                value={selectedHeaderTitle?.uploadHeaderTitle + ' > ' + selectedHeaderTitle?.downloadHeaderTitle || ''}
+                                                label="storage-title-selector"
+                                                defaultValue=''
+                                            >
+                                                {props.excelTranslatorHeaderList?.map((data, idx) => {
+                                                    return (
+                                                        <MenuItem key={'excel_translator_title' + idx} value={data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle} onClick={(e) => excelTranslatorHeader().selectedUploadHeaderName(e, data)}>{data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}</MenuItem>
+                                                    )
+                                                })}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </div>
+                            </FormInput>
+                            <div>
+                                <StorageControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></StorageControlBtn>
+                            </div>
+                        </TitleSelector>
                     </TranslatorBtnBox>
                 </DataContainer>
             </Container>

@@ -7,6 +7,7 @@ const Container = styled.div`
 `;
 
 const ItemContainer = styled.div`
+
 `;
 
 const ItemWrapper = styled.div`
@@ -39,9 +40,10 @@ const GroupTitle = styled.div`
 
 const DataText = styled.div`
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 2%;
     background-color: white;
+    border-radius: 5px;
 
     @media only screen and (max-width:425px){
         padding: 15px 0;
@@ -50,6 +52,8 @@ const DataText = styled.div`
 
 const BodyContainer = styled.div`
     padding: 10px;
+    max-height: 400px;
+    overflow: auto;
 `;
 
 const SubmitBtn = styled.button`
@@ -61,7 +65,8 @@ const SubmitBtn = styled.button`
 
 const HeaderInfo = styled.div`
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 1fr;
+    padding: 0px 10px;
     text-align: center;
     align-items: center;
 `;
@@ -83,8 +88,7 @@ const CreateTranslatorUploadHeaderDetailComponent = (props) => {
                         {props.uploadedExcelDataHeader[0]?.uploadedData.details?.map((data, idx) => {
                             return (
                                 <HeaderInfo className="input-group mb-3">
-                                    <div>항목 {idx + 1} </div>
-                                    <DataText>{data.colData}</DataText>
+                                    <DataText><span>{idx+1}.</span> <span>{data.colData}</span></DataText>
                                 </HeaderInfo>
                             )
                         })}
